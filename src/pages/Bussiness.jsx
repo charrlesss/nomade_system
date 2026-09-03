@@ -20,7 +20,6 @@ function Business() {
   const loadBusiness = async () => {
     try {
       const res = await api.get("/business");
-      console.log(res.data)
       setBusiness(res.data.businesses);
     } catch (err) {
       console.log(err);

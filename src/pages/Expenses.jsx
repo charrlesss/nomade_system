@@ -3,7 +3,7 @@ import api from "../services/api";
 import ExpensesModal from "../components/ExpensesModal";
 import { useSearchParams } from "react-router-dom";
 import ExpenseReportModal from "../components/ExpenseReportModal";
-
+import "../styles/expenses.css";
 function Expenses() {
   const [searchParams] = useSearchParams();
   const business = searchParams.get("business");
@@ -79,7 +79,7 @@ function Expenses() {
   };
 
   return (
-    <div className="position-relative" style={{position:"relative"}}>
+    <div className="position-relative" style={{ position: "relative" }}>
       {loading && (
         <div className="sales-loading-overlay">
           <div className="spinner-border text-success" role="status">
@@ -104,83 +104,84 @@ function Expenses() {
             </button>
           </div>
         </div>
-
-        {loading ? null : (
-          <table className="table table-bordered table-hover">
-            <thead className="table-dark">
-              <tr>
-                <th>Date</th>
-
-                <th>Category</th>
-
-                <th>Expense</th>
-
-                <th className="text-end">Amount</th>
-
-                <th>Payment</th>
-
-                <th>Recurring</th>
-
-                <th width="170">Action</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {expenses.length === 0 ? (
+        <div className="expenses-table-wrapper">
+          {loading ? null : (
+            <table className="table table-bordered table-hover">
+              <thead className="table-dark">
                 <tr>
-                  <td colSpan="8" className="text-center">
-                    No Expenses Found
-                  </td>
+                  <th>Date</th>
+
+                  <th>Category</th>
+
+                  <th>Expense</th>
+
+                  <th className="text-end">Amount</th>
+
+                  <th>Payment</th>
+
+                  <th>Recurring</th>
+
+                  <th width="170">Action</th>
                 </tr>
-              ) : (
-                expenses.map((expense) => (
-                  <tr key={expense.expenses_id}>
-                    <td>
-                      {new Date(expense.expense_date).toLocaleDateString(
-                        "en-PH",
-                        {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        },
-                      )}
-                    </td>
+              </thead>
 
-                    <td>{expense.category}</td>
-
-                    <td>{expense.expense_name}</td>
-
-                    <td className="text-end">
-                      ₱{Number(expense.amount).toFixed(2)}
-                    </td>
-
-                    <td>{expense.payment_method}</td>
-
-                    <td>
-                      {expense.is_recurring ? expense.recurring_type : "-"}
-                    </td>
-
-                    <td>
-                      <button
-                        className="btn btn-warning btn-sm me-2"
-                        onClick={() => editExpense(expense)}
-                      >
-                        Edit
-                      </button>
-
-                      <button
-                        className="btn btn-danger btn-sm"
-                        onClick={() => deleteExpense(expense.expenses_id)}
-                      >
-                        Delete
-                      </button>
+              <tbody>
+                {expenses.length === 0 ? (
+                  <tr>
+                    <td colSpan="8" className="text-center">
+                      No Expenses Found
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        )}
+                ) : (
+                  expenses.map((expense) => (
+                    <tr key={expense.expenses_id}>
+                      <td>
+                        {new Date(expense.expense_date).toLocaleDateString(
+                          "en-PH",
+                          {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          },
+                        )}
+                      </td>
+
+                      <td>{expense.category}</td>
+
+                      <td>{expense.expense_name}</td>
+
+                      <td className="text-end">
+                        ₱{Number(expense.amount).toFixed(2)}
+                      </td>
+
+                      <td>{expense.payment_method}</td>
+
+                      <td>
+                        {expense.is_recurring ? expense.recurring_type : "-"}
+                      </td>
+
+                      <td>
+                        <button
+                          className="btn btn-warning btn-sm me-2"
+                          onClick={() => editExpense(expense)}
+                        >
+                          Edit
+                        </button>
+
+                        <button
+                          className="btn btn-danger btn-sm"
+                          onClick={() => deleteExpense(expense.expenses_id)}
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          )}
+        </div>
 
         <ExpensesModal
           show={showModal}

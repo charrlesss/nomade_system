@@ -3,6 +3,11 @@ import Calendar from "react-calendar";
 import { useSearchParams } from "react-router-dom";
 import "react-calendar/dist/Calendar.css";
 import api from "../services/api";
+import "../styles/sales.css";
+
+// ========================================
+// DATE HELPERS
+// ========================================
 
 const getLocalDateString = (date) => {
   if (!date) return "";
@@ -52,16 +57,35 @@ const getTodayDate = () => {
   );
 };
 
+// ========================================
+// MAIN COMPONENT
+// ========================================
+
 function SalesTracking() {
   const [searchParams] = useSearchParams();
+
   const business = searchParams.get("business");
 
+  // ========================================
+  // CALENDAR
+  // ========================================
+
   const [activeStartDate, setActiveStartDate] = useState(new Date());
+
   const [selectedDate, setSelectedDate] = useState(new Date());
+
+  // ========================================
+  // LOADING
+  // ========================================
 
   const [loading, setLoading] = useState(false);
 
+  // ========================================
+  // SALES
+  // ========================================
+
   const [sales, setSales] = useState([]);
+
   const [salesAnalytics, setSalesAnalytics] = useState({
     gross_sales: "0.00",
     cash_sales: "0.00",
@@ -73,18 +97,23 @@ function SalesTracking() {
     lowest_sales: "0.00",
   });
 
+  // ========================================
+  // EDITING
+  // ========================================
+
   const [editing, setEditing] = useState(false);
+
   const [currentId, setCurrentId] = useState(null);
 
-  const [form, setForm] = useState({
-    sales_date: getTodayDate(),
-    gross_sales: "0.00",
-    cash_sales: "0.00",
-    gcash_sales: "0.00",
-    other_sales: "0.00",
-    cups: "0",
-    notes: "",
-  });
+  // ========================================
+  // MOBILE / TABLET MODAL
+  // ========================================
+
+  const [showSalesModal, setShowSalesModal] = useState(false);
+
+  // ========================================
+  // FORM
+  // ========================================
 
   const emptyForm = {
     sales_date: getTodayDate(),
@@ -96,29 +125,57 @@ function SalesTracking() {
     notes: "",
   };
 
+  const [form, setForm] = useState(emptyForm);
+
+  // ========================================
+  // CALENDAR BUTTON TITLES
+  // ========================================
+
   useEffect(() => {
     const prevYear = document.querySelector(
       ".react-calendar__navigation__prev2-button",
     );
+
     const prevMonth = document.querySelector(
       ".react-calendar__navigation__prev-button",
     );
+
     const nextMonth = document.querySelector(
       ".react-calendar__navigation__next-button",
     );
+
     const nextYear = document.querySelector(
       ".react-calendar__navigation__next2-button",
     );
 
-    if (prevYear) prevYear.title = "Previous Year";
-    if (prevMonth) prevMonth.title = "Previous Month";
-    if (nextMonth) nextMonth.title = "Next Month";
-    if (nextYear) nextYear.title = "Next Year";
+    if (prevYear) {
+      prevYear.title = "Previous Year";
+    }
+
+    if (prevMonth) {
+      prevMonth.title = "Previous Month";
+    }
+
+    if (nextMonth) {
+      nextMonth.title = "Next Month";
+    }
+
+    if (nextYear) {
+      nextYear.title = "Next Year";
+    }
   }, []);
+
+  // ========================================
+  // LOAD SALES WHEN BUSINESS / MONTH CHANGES
+  // ========================================
 
   useEffect(() => {
     loadSales(business, activeStartDate);
   }, [business, activeStartDate]);
+
+  // ========================================
+  // LOAD SALES
+  // ========================================
 
   const loadSales = async (business, activeStartDate) => {
     setLoading(true);
@@ -157,28 +214,31 @@ function SalesTracking() {
     }
   };
 
+  // ========================================
+  // FORM CHANGE
+  // ========================================
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
     setForm((prevForm) => {
-      // 1. Kunin ang pinakabagong state at i-update ang binagong field
       const updatedForm = {
         ...prevForm,
         [name]: value,
       };
 
-      // 2. I-compute ang bagong sum kung ang binagong field ay isa sa mga sales fields
+      // Automatically calculate Gross Sales
       if (
         name === "cash_sales" ||
         name === "gcash_sales" ||
         name === "other_sales"
       ) {
-        // Gumamit ng parseFloat para maging numero, gawing 0 kung walang laman (NaN)
         const cash = parseFloat(updatedForm.cash_sales) || 0;
+
         const gcash = parseFloat(updatedForm.gcash_sales) || 0;
+
         const other = parseFloat(updatedForm.other_sales) || 0;
 
-        // I-format ang sum para laging may dalawang decimal places (.toFixed(2))
         updatedForm.gross_sales = (cash + gcash + other).toFixed(2);
       }
 
@@ -186,8 +246,13 @@ function SalesTracking() {
     });
   };
 
+  // ========================================
+  // CALENDAR DATE CHANGE
+  // ========================================
+
   const handleCalendarChange = (date) => {
     setSelectedDate(date);
+
     const formatted =
       date.getFullYear() +
       "-" +
@@ -195,9 +260,12 @@ function SalesTracking() {
       "-" +
       String(date.getDate()).padStart(2, "0");
 
-    // later
     loadSaleByDate(date, formatted);
   };
+
+  // ========================================
+  // LOAD SALE BY DATE
+  // ========================================
 
   const loadSaleByDate = async (date, formatted) => {
     const selectedDateString = getLocalDateString(date);
@@ -210,9 +278,15 @@ function SalesTracking() {
       const data = sales.filter(
         (item) => getLocalDateString(item.sales_date) === selectedDateString,
       );
+
       setEditing(true);
+
       setCurrentId(data[0].daily_sales_id);
-      setForm({ ...data[0], sales_date: formatted });
+
+      setForm({
+        ...data[0],
+        sales_date: formatted,
+      });
     } else {
       setForm({
         ...emptyForm,
@@ -220,50 +294,102 @@ function SalesTracking() {
       });
 
       setEditing(false);
+
       setCurrentId(null);
     }
+
+    // Open modal for tablet and mobile
+    if (window.innerWidth < 1200) {
+      setShowSalesModal(true);
+    }
   };
+
+  // ========================================
+  // SAVE SALES
+  // ========================================
 
   const saveSales = async () => {
-    const newForm = {
-      ...form,
-      business_id: business,
-    };
+    try {
+      const newForm = {
+        ...form,
+        business_id: business,
+      };
 
-    if (editing) {
-      const res = await api.put(`/sales/${currentId}`, newForm);
-      alert(res.data.message);
-    } else {
-      const res = await api.post("/sales", newForm);
-      alert(res.data.message);
+      if (editing) {
+        const res = await api.put(`/sales/${currentId}`, newForm);
+
+        alert(res.data.message);
+      } else {
+        const res = await api.post("/sales", newForm);
+
+        alert(res.data.message);
+      }
+
+      setForm(emptyForm);
+
+      setEditing(false);
+
+      setCurrentId(null);
+
+      // Close mobile/tablet modal
+      setShowSalesModal(false);
+
+      loadSales(business, activeStartDate);
+    } catch (err) {
+      console.error("SAVE SALES ERROR:", err);
+
+      alert("Failed to save sales.");
     }
-
-    setForm(emptyForm);
-    setEditing(false);
-    setCurrentId(null);
-
-    loadSales(business, activeStartDate);
   };
 
+  // ========================================
+  // DELETE SALES
+  // ========================================
+
   const deleteSales = async () => {
-    if (!window.confirm("Delete this sales record?")) return;
+    if (!window.confirm("Delete this sales record?")) {
+      return;
+    }
 
     try {
       const res = await api.delete(`/sales/${currentId}`);
+
       alert(res.data.message);
 
       setForm(emptyForm);
+
       setEditing(false);
+
       setCurrentId(null);
+
+      setShowSalesModal(false);
 
       loadSales(business, activeStartDate);
     } catch (err) {
       console.log(err);
+
+      alert("Failed to delete sales.");
     }
   };
 
+  // ========================================
+  // CLOSE MODAL
+  // ========================================
+
+  const closeSalesModal = () => {
+    setShowSalesModal(false);
+  };
+
+  // ========================================
+  // RENDER
+  // ========================================
+
   return (
     <div className="position-relative">
+      {/* ====================================
+          LOADING OVERLAY
+      ===================================== */}
+
       {loading && (
         <div className="sales-loading-overlay">
           <div className="spinner-border text-success" role="status">
@@ -273,19 +399,26 @@ function SalesTracking() {
           <div className="mt-2 fw-semibold">Loading sales...</div>
         </div>
       )}
-      <div className="container-fluid ">
-        {/* <h3 className="mb-4">Sales Tracking</h3> */}
 
-        <div className="row">
-          {/* Calendar */}
+      <div className="container-fluid sales-page">
+        {/* ====================================
+            CALENDAR + SALES
+        ===================================== */}
 
-          <div className="col-lg-6 mb-4 flex-fill">
-            <div className="card-body d-flex justify-content-center align-items-center">
+        <div className="row g-3">
+          {/* ==================================
+              CALENDAR
+          ================================== */}
+
+          <div className="col-12 col-xl-8">
+            <div className="calendar-wrapper">
               <Calendar
                 value={selectedDate}
                 onChange={handleCalendarChange}
                 tileContent={({ date, view }) => {
-                  if (view !== "month") return null;
+                  if (view !== "month") {
+                    return null;
+                  }
 
                   const calendarDate = getDateOnly(date);
 
@@ -293,7 +426,9 @@ function SalesTracking() {
                     (item) => getDateOnly(item.sales_date) === calendarDate,
                   );
 
-                  if (!sale) return null;
+                  if (!sale) {
+                    return null;
+                  }
 
                   return (
                     <>
@@ -301,251 +436,175 @@ function SalesTracking() {
 
                       <div className="calendar-tile-content">
                         <p>₱{formatCurrency(sale.gross_sales)}</p>
+
                         <p>☕︎ {sale.cups}</p>
                       </div>
                     </>
                   );
                 }}
                 onActiveStartDateChange={({ activeStartDate }) => {
-                  console.log(activeStartDate);
                   setActiveStartDate(activeStartDate);
                 }}
                 showFixedNumberOfWeeks
               />
             </div>
+
+            {/* ==================================
+                TABLET / MOBILE BUTTON
+            ================================== */}
+
+            <div className="sales-form-trigger d-xl-none">
+              <button
+                className={`btn ${
+                  editing ? "btn-warning" : "btn-success"
+                } w-100`}
+                onClick={() => setShowSalesModal(true)}
+              >
+                {editing ? "Edit Sales" : "Add Sales"}
+              </button>
+            </div>
           </div>
 
-          {/* Today Sales */}
+          {/* ==================================
+              DESKTOP SALES FORM
+          ================================== */}
 
-          <div className="col-lg-6 mb-2 " style={{ width: "250px" }}>
-            <div className="card shadow-sm">
-              <div className="card-header bg-success text-white">
-                Today Sales
-              </div>
-
-              <div className="card-body">
-                <div className="mb-1">
-                  <label
-                    className="form-label fw-bold mb-1"
-                    style={{ fontSize: "13px" }}
-                  >
-                    Selected Date
-                  </label>
-
-                  <input
-                    className="form-control"
-                    value={formatDisplayDate(form.sales_date)}
-                    readOnly
-                    style={{
-                      height: "23px",
-                      fontSize: "14px",
-                    }}
-                  />
-                </div>
-
-                <div className="mb-1">
-                  <label
-                    className="form-label fw-bold mb-1"
-                    style={{ fontSize: "13px" }}
-                  >
-                    Cash Sales
-                  </label>
-
-                  <input
-                    type="number"
-                    className="form-control"
-                    name="cash_sales"
-                    value={form.cash_sales}
-                    onChange={handleChange}
-                    style={{
-                      height: "23px",
-                      fontSize: "14px",
-                    }}
-                  />
-                </div>
-
-                <div className="mb-1">
-                  <label
-                    className="form-label fw-bold mb-1"
-                    style={{ fontSize: "13px" }}
-                  >
-                    GCash Sales
-                  </label>
-
-                  <input
-                    type="number"
-                    className="form-control"
-                    name="gcash_sales"
-                    value={form.gcash_sales}
-                    onChange={handleChange}
-                    style={{
-                      height: "23px",
-                      fontSize: "14px",
-                    }}
-                  />
-                </div>
-
-                <div className="mb-1">
-                  <label
-                    className="form-label fw-bold mb-1"
-                    style={{ fontSize: "13px" }}
-                  >
-                    Maya / Others
-                  </label>
-
-                  <input
-                    type="number"
-                    className="form-control"
-                    name="other_sales"
-                    value={form.other_sales}
-                    onChange={handleChange}
-                    style={{
-                      height: "23px",
-                      fontSize: "14px",
-                    }}
-                  />
-                </div>
-
-                <div className="mb-1">
-                  <label
-                    className="form-label fw-bold mb-1"
-                    style={{ fontSize: "13px" }}
-                  >
-                    Gross Sales
-                  </label>
-
-                  <input
-                    type="number"
-                    className="form-control"
-                    name="gross_sales"
-                    value={form.gross_sales}
-                    onChange={handleChange}
-                    style={{
-                      height: "23px",
-                      fontSize: "14px",
-                    }}
-                  />
-                </div>
-
-                <div className="mb-1">
-                  <label
-                    className="form-label fw-bold mb-1"
-                    style={{ fontSize: "13px" }}
-                  >
-                    Cups
-                  </label>
-
-                  <input
-                    type="number"
-                    className="form-control"
-                    name="cups"
-                    value={form.cups}
-                    onChange={handleChange}
-                    style={{
-                      height: "23px",
-                      fontSize: "14px",
-                    }}
-                  />
-                </div>
-
-                <div className="mb-3">
-                  <label
-                    className="form-label fw-bold mb-1"
-                    style={{ fontSize: "13px" }}
-                  >
-                    Notes
-                  </label>
-
-                  <textarea
-                    className="form-control"
-                    rows="3"
-                    name="notes"
-                    value={form.notes}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="d-flex flex-row justify-content-between">
-                  <button
-                    className={`btn ${editing ? "btn-warning" : "btn-success"}`}
-                    onClick={saveSales}
-                  >
-                    {editing ? "Update" : "Save Sales"}
-                  </button>
-                  {editing && (
-                    <button
-                      className="btn btn-danger ms-2"
-                      onClick={deleteSales}
-                    >
-                      Delete
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
+          <div className="col-12 col-xl-4 desktop-sales-form">
+            <SalesForm
+              form={form}
+              editing={editing}
+              handleChange={handleChange}
+              saveSales={saveSales}
+              deleteSales={deleteSales}
+              formatDisplayDate={formatDisplayDate}
+            />
           </div>
         </div>
 
-        {/* Monthly Summary */}
+        {/* ====================================
+            TABLET / MOBILE MODAL
+        ===================================== */}
 
-        <div className="card shadow-sm">
+        {showSalesModal && (
+          <div className="sales-modal-backdrop" onClick={closeSalesModal}>
+            <div className="sales-modal" onClick={(e) => e.stopPropagation()}>
+              {/* MODAL HEADER */}
+
+              <div className="sales-modal-header">
+                <h5 className="mb-0 fw-bold">
+                  {editing ? "Edit Sales" : "Add Sales"}
+                </h5>
+
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={closeSalesModal}
+                ></button>
+              </div>
+
+              {/* MODAL BODY */}
+
+              <div className="sales-modal-body">
+                <SalesForm
+                  form={form}
+                  editing={editing}
+                  handleChange={handleChange}
+                  saveSales={saveSales}
+                  deleteSales={deleteSales}
+                  formatDisplayDate={formatDisplayDate}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ====================================
+            MONTHLY SUMMARY
+        ===================================== */}
+
+        <div className="card shadow-sm mt-3">
           <div className="card-header bg-dark text-white">
             Total Sales This Month
           </div>
 
           <div className="card-body">
             <div className="row">
-              <div className="col-md-3 mb-3">
+              {/* GROSS */}
+
+              <div className="col-12 col-sm-6 col-lg-3 mb-3">
                 <div className="border rounded p-3 text-center">
                   <h6>Gross Sales</h6>
+
                   <h4>₱{formatCurrency(salesAnalytics.gross_sales)}</h4>
                 </div>
               </div>
 
-              <div className="col-md-3 mb-3">
+              {/* CASH */}
+
+              <div className="col-12 col-sm-6 col-lg-3 mb-3">
                 <div className="border rounded p-3 text-center">
                   <h6>Cash Sales</h6>
+
                   <h4>₱{formatCurrency(salesAnalytics.cash_sales)}</h4>
                 </div>
               </div>
 
-              <div className="col-md-3 mb-3">
+              {/* GCASH */}
+
+              <div className="col-12 col-sm-6 col-lg-3 mb-3">
                 <div className="border rounded p-3 text-center">
                   <h6>GCash Sales</h6>
+
                   <h4>₱{formatCurrency(salesAnalytics.gcash_sales)}</h4>
                 </div>
               </div>
 
-              <div className="col-md-3 mb-3">
+              {/* OTHER */}
+
+              <div className="col-12 col-sm-6 col-lg-3 mb-3">
                 <div className="border rounded p-3 text-center">
                   <h6>Other Payment Sales</h6>
+
                   <h4>₱{formatCurrency(salesAnalytics.other_sales)}</h4>
                 </div>
               </div>
 
-              <div className="col-md-3 mb-3">
+              {/* CUPS */}
+
+              <div className="col-12 col-sm-6 col-lg-3 mb-3">
                 <div className="border rounded p-3 text-center">
                   <h6>Cups</h6>
+
                   <h4>{salesAnalytics.cups}</h4>
                 </div>
               </div>
 
-              <div className="col-md-3 mb-3">
+              {/* AVERAGE DAY */}
+
+              <div className="col-12 col-sm-6 col-lg-3 mb-3">
                 <div className="border rounded p-3 text-center">
                   <h6>Average / Day</h6>
+
                   <h4>₱{formatCurrency(salesAnalytics.average_day)}</h4>
                 </div>
               </div>
 
-              <div className="col-md-3 mb-3">
+              {/* AVERAGE CUPS */}
+
+              <div className="col-12 col-sm-6 col-lg-3 mb-3">
                 <div className="border rounded p-3 text-center">
                   <h6>Average / Cups</h6>
+
                   <h4>{formatCurrency(salesAnalytics.average_cups_day)}</h4>
                 </div>
               </div>
 
-              <div className="col-md-3 mb-3">
+              {/* LOWEST */}
+
+              <div className="col-12 col-sm-6 col-lg-3 mb-3">
                 <div className="border rounded p-3 text-center">
                   <h6>Lowest Sales</h6>
+
                   <h4>₱{formatCurrency(salesAnalytics.lowest_sales)}</h4>
                 </div>
               </div>
@@ -557,16 +616,189 @@ function SalesTracking() {
   );
 }
 
+// ========================================
+// SALES FORM COMPONENT
+// ========================================
+
+function SalesForm({
+  form,
+  editing,
+  handleChange,
+  saveSales,
+  deleteSales,
+  formatDisplayDate,
+}) {
+  return (
+    <div className="card shadow-sm sales-form-card">
+      {/* HEADER */}
+
+      <div className="card-header bg-success text-white">
+        <strong>Today Sales</strong>
+      </div>
+
+      {/* BODY */}
+
+      <div className="card-body">
+        {/* ==================================
+            DATE
+        ================================== */}
+
+        <div className="mb-3">
+          <label className="form-label fw-bold">Selected Date</label>
+
+          <input
+            className="form-control"
+            value={formatDisplayDate(form.sales_date)}
+            readOnly
+          />
+        </div>
+
+        {/* ==================================
+            CASH
+        ================================== */}
+
+        <div className="mb-3">
+          <label className="form-label fw-bold">Cash Sales</label>
+
+          <input
+            type="number"
+            className="form-control"
+            name="cash_sales"
+            value={form.cash_sales}
+            onChange={handleChange}
+            step="0.01"
+          />
+        </div>
+
+        {/* ==================================
+            GCASH
+        ================================== */}
+
+        <div className="mb-3">
+          <label className="form-label fw-bold">GCash Sales</label>
+
+          <input
+            type="number"
+            className="form-control"
+            name="gcash_sales"
+            value={form.gcash_sales}
+            onChange={handleChange}
+            step="0.01"
+          />
+        </div>
+
+        {/* ==================================
+            MAYA / OTHERS
+        ================================== */}
+
+        <div className="mb-3">
+          <label className="form-label fw-bold">Maya / Others</label>
+
+          <input
+            type="number"
+            className="form-control"
+            name="other_sales"
+            value={form.other_sales}
+            onChange={handleChange}
+            step="0.01"
+          />
+        </div>
+
+        {/* ==================================
+            GROSS SALES
+        ================================== */}
+
+        <div className="mb-3">
+          <label className="form-label fw-bold">Gross Sales</label>
+
+          <input
+            type="number"
+            className="form-control"
+            name="gross_sales"
+            value={form.gross_sales}
+            onChange={handleChange}
+            step="0.01"
+          />
+        </div>
+
+        {/* ==================================
+            CUPS
+        ================================== */}
+
+        <div className="mb-3">
+          <label className="form-label fw-bold">Cups</label>
+
+          <input
+            type="number"
+            className="form-control"
+            name="cups"
+            value={form.cups}
+            onChange={handleChange}
+          />
+        </div>
+
+        {/* ==================================
+            NOTES
+        ================================== */}
+
+        <div className="mb-3">
+          <label className="form-label fw-bold">Notes</label>
+
+          <textarea
+            className="form-control"
+            rows="3"
+            name="notes"
+            value={form.notes}
+            onChange={handleChange}
+          />
+        </div>
+
+        {/* ==================================
+            BUTTONS
+        ================================== */}
+
+        <div className="d-flex gap-2">
+          <button
+            className={`btn ${
+              editing ? "btn-warning" : "btn-success"
+            } flex-grow-1`}
+            onClick={saveSales}
+          >
+            {editing ? "Update" : "Save Sales"}
+          </button>
+
+          {editing && (
+            <button className="btn btn-danger" onClick={deleteSales}>
+              Delete
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ========================================
+// DATE DISPLAY
+// ========================================
+
 const formatDisplayDate = (dateString) => {
-  if (!dateString) return "";
+  if (!dateString) {
+    return "";
+  }
 
   const [year, month, day] = dateString.split("-");
 
   return `${month}/${day}/${year}`;
 };
 
+// ========================================
+// CURRENCY
+// ========================================
+
 const formatCurrency = (val) => {
   const num = Number.parseFloat(val) || 0;
+
   return num.toLocaleString("en-US", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,

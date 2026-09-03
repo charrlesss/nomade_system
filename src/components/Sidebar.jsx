@@ -1,76 +1,153 @@
 import { Link, useSearchParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import "../styles/sidebar.css";
 
 function Sidebar() {
-  const [searchParams] = useSearchParams();
-
+  const [searchParams, setSearchParams] = useSearchParams();
   const business = searchParams.get("business");
+
+  const [costingOpen, setCostingOpen] = useState(true);
 
   const withBusiness = (path) => {
     if (!business) return path;
 
-    return `${path}?business=${business}`;
+    return `${path}?business=${encodeURIComponent(business)}`;
   };
 
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams);
+    params.set("business", String(6));
+
+    setSearchParams(params, {
+      replace: true,
+    });
+  }, []);
+
   return (
-    <div
-      className="bg-dark text-white p-3"
-      style={{
-        width: 220,
-        minHeight: "100vh",
-      }}
-    >
-      <h3>Costing App</h3>
+    <>
+      {/* =========================
+          MOBILE NAVBAR
+      ========================== */}
+      <nav className="navbar navbar-dark bg-dark d-lg-none ">
+        <div className="container-fluid">
+          <button
+            className="navbar-toggler"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#mobileSidebar"
+            aria-controls="mobileSidebar"
+          >
+            <span className="navbar-toggler-icon"></span>
+          </button>
+        </div>
+      </nav>
 
-      <hr />
+      {/* =========================
+          MOBILE OFFCANVAS
+      ========================== */}
+      <div
+        className="offcanvas offcanvas-start bg-dark text-white"
+        tabIndex="-1"
+        id="mobileSidebar"
+        aria-labelledby="mobileSidebarLabel"
+      >
+        <div className="offcanvas-header">
+          <button
+            type="button"
+            className="btn-close btn-close-white"
+            data-bs-dismiss="offcanvas"
+            aria-label="Close"
+          ></button>
+        </div>
 
-      <Link className="btn btn-outline-light w-100 mb-2" to={withBusiness("/")}>
-        Business
+        <div className="offcanvas-body">
+          <SidebarLinks
+            withBusiness={withBusiness}
+            costingOpen={costingOpen}
+            setCostingOpen={setCostingOpen}
+          />
+        </div>
+      </div>
+
+      {/* =========================
+          DESKTOP SIDEBAR
+      ========================== */}
+      <aside className="sidebar-desktop bg-dark text-white">
+        <div className="sidebar-content">
+          <SidebarLinks
+            withBusiness={withBusiness}
+            costingOpen={costingOpen}
+            setCostingOpen={setCostingOpen}
+          />
+        </div>
+      </aside>
+    </>
+  );
+}
+
+/* =================================
+   SIDEBAR LINKS
+================================= */
+
+function SidebarLinks({ withBusiness, costingOpen, setCostingOpen }) {
+  return (
+    <div className="sidebar-links">
+      {/* SALES */}
+      <Link className="sidebar-link" to={withBusiness("/")}>
+        <span>📊</span>
+        <span>Sales</span>
       </Link>
 
-      <Link
-        className="btn btn-outline-light w-100 mb-2"
-        to={withBusiness("/formulas")}
-      >
-        Formulas
+      {/* STOCKS */}
+      <Link className="sidebar-link" to={withBusiness("/stocks")}>
+        <span>📦</span>
+        <span>Stocks</span>
       </Link>
 
-      <Link
-        className="btn btn-outline-light w-100 mb-2"
-        to={withBusiness("/items")}
-      >
-        Items
+      {/* EXPENSES */}
+      <Link className="sidebar-link" to={withBusiness("/expenses")}>
+        <span>💰</span>
+        <span>Expenses</span>
       </Link>
 
-      <Link
-        className="btn btn-outline-light w-100 mb-2"
-        to={withBusiness("/categories")}
+      {/* COSTING */}
+      <button
+        type="button"
+        className="sidebar-link sidebar-button"
+        onClick={() => setCostingOpen(!costingOpen)}
       >
-        Categories
-      </Link>
-      <Link
-        className="btn btn-outline-light w-100 mb-2"
-        to={withBusiness("/expenses")}
-      >
-        Expenses
-      </Link>
-      <Link
-        className="btn btn-outline-light w-100 mb-2"
-        to={withBusiness("/sales")}
-      >
-        Sales
-      </Link>
-      <Link
-        className="btn btn-outline-light w-100 mb-2"
-        to={withBusiness("/stocks")}
-      >
-        Stocks
-      </Link>
-      <Link
-        className="btn btn-outline-light w-100 mb-2"
-        to={withBusiness("/pos")}
-      >
-        POS
-      </Link>
+        <span>🧮</span>
+
+        <span className="flex-grow-1 text-start">Costing</span>
+
+        <span>{costingOpen ? "▾" : "▸"}</span>
+      </button>
+
+      {/* COSTING SUB MENU */}
+      {costingOpen && (
+        <div className="costing-submenu">
+          <Link
+            className="sidebar-sublink"
+            to={withBusiness("/costing/formulas")}
+          >
+            <span>•</span>
+            <span>Formulas</span>
+          </Link>
+
+          <Link className="sidebar-sublink" to={withBusiness("/costing/items")}>
+            <span>•</span>
+            <span>Items</span>
+          </Link>
+
+          <Link
+            className="sidebar-sublink"
+            to={withBusiness("/costing/categories")}
+          >
+            <span>•</span>
+            <span>Categories</span>
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

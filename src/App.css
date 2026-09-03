@@ -7,6 +7,7 @@ body {
     Verdana,
     sans-serif;
 }
+/* =============================================== */
 
 a {
   text-decoration: none;
@@ -67,10 +68,6 @@ table {
 .sidebar a:hover {
   background: #2563eb;
   color: white;
-}
-
-.content {
-  flex: 1;
 }
 
 .navbar {
@@ -359,4 +356,84 @@ tbody tr:hover {
   position: absolute;
   top: 0px;
   right: 0px;
+}
+
+/*============================================*/
+
+.main {
+  display: flex;
+}
+
+.content {
+  flex: 1;
+  padding: 5px;
+}
+
+/* ========================================
+   TABLET
+   768px - 1199px
+======================================== */
+
+@media (max-width: 1199.98px) {
+}
+
+@media (max-width: 992px) {
+  .main {
+    flex-direction: column;
+  }
+
+  .react-calendar__tile {
+    height: 70px;
+  }
+  .react-calendar__month-view__days__day {
+    font-size: 12px;
+  }
+
+  .calendar-tile-content {
+    font-size: 12px;
+  }
+}
+
+/* ========================================
+   MOBILE
+   BELOW 768px
+======================================== */
+
+@media (max-width: 767.98px) {
+  .main {
+    flex-direction: column;
+  }
+
+  .react-calendar__tile {
+    height: 60px;
+  }
+
+  .react-calendar__month-view__days__day {
+    font-size: 11px;
+  }
+
+  .calendar-tile-content {
+    font-size: 11px;
+  }
+}
+
+/* ========================================
+   SMALL MOBILE
+======================================== */
+
+@media (max-width: 480px) {
+  .main {
+    flex-direction: column;
+  }
+  .react-calendar__tile {
+    height: 60px;
+  }
+
+  .react-calendar__month-view__days__day {
+    font-size: 10px;
+  }
+
+  .calendar-tile-content {
+    font-size: 10px;
+  }
 }

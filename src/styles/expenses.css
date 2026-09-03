@@ -1,0 +1,326 @@
+/* ========================================
+   EXPENSES PAGE
+======================================== */
+
+.expenses-page {
+  width: 100%;
+}
+
+
+/* ========================================
+   HEADER
+======================================== */
+
+.expenses-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 15px;
+
+  margin-bottom: 20px;
+}
+
+.expenses-title {
+  margin: 0;
+  font-weight: 600;
+}
+
+.expenses-actions {
+  display: flex;
+  gap: 8px;
+}
+
+
+/* ========================================
+   EXPENSES TABLE
+======================================== */
+
+.expenses-table-wrapper {
+  width: 100%;
+  max-width: 100%;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  -webkit-overflow-scrolling: touch;
+
+  display: block;
+}
+
+.expenses-table {
+  width: 100%;
+  margin-bottom: 0;
+
+  vertical-align: middle;
+
+  /* Important */
+  min-width: 900px;
+}
+
+.expenses-table th,
+.expenses-table td {
+  white-space: nowrap;
+}
+
+.expenses-table th {
+  vertical-align: middle;
+}
+
+.expenses-table td {
+  vertical-align: middle;
+}
+
+.expenses-action-column {
+  min-width: 150px;
+}
+
+/* ========================================
+   MOBILE CARDS
+======================================== */
+
+.expenses-mobile-list {
+  display: none;
+}
+
+.expense-card {
+  background: #fff;
+
+  border: 1px solid #dee2e6;
+  border-radius: 12px;
+
+  padding: 16px;
+
+  margin-bottom: 12px;
+
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+
+/* ========================================
+   CARD HEADER
+======================================== */
+
+.expense-card-header {
+  display: flex;
+
+  justify-content: space-between;
+  align-items: flex-start;
+
+  gap: 15px;
+
+  padding-bottom: 12px;
+
+  border-bottom: 1px solid #eee;
+}
+
+.expense-card-name {
+  font-size: 17px;
+  font-weight: 600;
+
+  word-break: break-word;
+}
+
+.expense-card-category {
+  font-size: 13px;
+
+  color: #6c757d;
+
+  margin-top: 3px;
+}
+
+.expense-card-amount {
+  font-size: 17px;
+
+  font-weight: 700;
+
+  white-space: nowrap;
+}
+
+
+/* ========================================
+   DETAILS
+======================================== */
+
+.expense-card-details {
+  padding: 12px 0;
+}
+
+.expense-detail {
+  display: flex;
+
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 15px;
+
+  padding: 6px 0;
+}
+
+.expense-detail-label {
+  color: #6c757d;
+
+  font-size: 14px;
+}
+
+.expense-detail-value {
+  font-weight: 500;
+
+  text-align: right;
+
+  word-break: break-word;
+}
+
+
+/* ========================================
+   CARD ACTIONS
+======================================== */
+
+.expense-card-actions {
+  display: flex;
+
+  gap: 8px;
+
+  padding-top: 12px;
+
+  border-top: 1px solid #eee;
+}
+
+.expense-card-actions button {
+  flex: 1;
+}
+
+
+/* ========================================
+   EMPTY STATE
+======================================== */
+
+.expenses-empty {
+  text-align: center;
+
+  padding: 40px 20px;
+
+  border: 1px solid #dee2e6;
+
+  border-radius: 10px;
+
+  background: #fff;
+
+  color: #6c757d;
+}
+
+
+/* ========================================
+   TABLET
+   768px - 1199px
+======================================== */
+
+@media (max-width: 1199.98px) {
+
+  .expenses-table-wrapper {
+    /* display: none; */
+  }
+
+  .expenses-mobile-list {
+    display: block;
+  }
+
+}
+
+
+/* ========================================
+   MOBILE
+   BELOW 768px
+======================================== */
+
+@media (max-width: 767.98px) {
+
+  .expenses-header {
+    flex-direction: column;
+
+    align-items: stretch;
+
+    margin-bottom: 15px;
+  }
+
+
+  .expenses-title {
+    font-size: 20px;
+  }
+
+
+  .expenses-actions {
+    display: flex;
+
+    width: 100%;
+  }
+
+
+  .expenses-actions .btn {
+    flex: 1;
+  }
+
+
+  .expense-card {
+    padding: 14px;
+
+    border-radius: 10px;
+  }
+
+
+  .expense-card-header {
+    gap: 10px;
+  }
+
+
+  .expense-card-name {
+    font-size: 16px;
+  }
+
+
+  .expense-card-amount {
+    font-size: 16px;
+  }
+
+}
+
+
+/* ========================================
+   SMALL MOBILE
+======================================== */
+
+@media (max-width: 480px) {
+
+  .expenses-actions {
+    flex-direction: column;
+  }
+
+
+  .expenses-actions .btn {
+    width: 100%;
+  }
+
+
+  .expense-card-header {
+    flex-direction: column;
+  }
+
+
+  .expense-card-amount {
+    align-self: flex-start;
+
+    font-size: 18px;
+  }
+
+
+  .expense-detail {
+    align-items: flex-start;
+  }
+
+
+  .expense-detail-value {
+    max-width: 60%;
+  }
+
+}

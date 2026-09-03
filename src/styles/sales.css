@@ -1,0 +1,273 @@
+/* ========================================
+   SALES PAGE
+======================================== */
+
+.sales-page {
+  width: 100%;
+}
+
+
+/* ========================================
+   CALENDAR
+======================================== */
+
+.calendar-wrapper {
+  width: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.calendar-wrapper .react-calendar {
+  width: 100%;
+  max-width: 850px;
+}
+
+
+/* ========================================
+   DESKTOP SALES FORM
+======================================== */
+
+.desktop-sales-form {
+  display: block;
+}
+
+.sales-form-card {
+  width: 100%;
+}
+
+
+/* ========================================
+   TABLET / MOBILE BUTTON
+======================================== */
+
+.sales-form-trigger {
+  margin-top: 15px;
+}
+
+
+/* ========================================
+   MODAL BACKDROP
+======================================== */
+
+.sales-modal-backdrop {
+  position: fixed;
+
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  background: rgba(0, 0, 0, 0.55);
+
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+
+  padding: 20px;
+
+  z-index: 9999;
+}
+
+
+/* ========================================
+   MODAL
+======================================== */
+
+.sales-modal {
+  width: 100%;
+  max-width: 500px;
+
+  max-height: 90vh;
+
+  background: #fff;
+
+  border-radius: 12px;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.25);
+
+  animation: salesModalIn 0.2s ease-out;
+}
+
+
+@keyframes salesModalIn {
+
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+}
+
+
+/* ========================================
+   MODAL HEADER
+======================================== */
+
+.sales-modal-header {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding: 16px 20px;
+
+  border-bottom: 1px solid #dee2e6;
+}
+
+
+/* ========================================
+   MODAL BODY
+======================================== */
+
+.sales-modal-body {
+  padding: 20px;
+
+  max-height: calc(90vh - 70px);
+
+  overflow-y: auto;
+}
+
+
+/* ========================================
+   TABLET
+   768px - 1199px
+======================================== */
+
+@media (max-width: 1199.98px) {
+
+  .desktop-sales-form {
+    display: none;
+  }
+
+
+  .calendar-wrapper .react-calendar {
+    max-width: 100%;
+  }
+
+}
+
+
+/* ========================================
+   MOBILE
+   BELOW 768px
+======================================== */
+
+@media (max-width: 767.98px) {
+
+  .sales-modal-backdrop {
+
+    padding: 0;
+
+    align-items: flex-end;
+
+  }
+
+
+  .sales-modal {
+
+    width: 100%;
+
+    max-width: 100%;
+
+    max-height: 94vh;
+
+    border-radius:
+      16px 16px 0 0;
+
+  }
+
+
+  .sales-modal-header {
+
+    padding:
+      14px 16px;
+
+  }
+
+
+  .sales-modal-body {
+
+    padding: 16px;
+
+    max-height:
+      calc(94vh - 65px);
+
+  }
+
+
+  .calendar-wrapper .react-calendar {
+
+    font-size: 13px;
+
+  }
+
+
+  .sales-form-trigger {
+
+    margin-top: 12px;
+
+    margin-bottom: 15px;
+
+  }
+
+}
+
+
+/* ========================================
+   SMALL MOBILE
+======================================== */
+
+@media (max-width: 480px) {
+
+  .sales-modal {
+
+    max-height: 96vh;
+
+  }
+
+
+  .sales-modal-body {
+
+    padding: 14px;
+
+    max-height:
+      calc(96vh - 65px);
+
+  }
+
+
+  .sales-form-card {
+
+    box-shadow: none !important;
+
+    border: none;
+
+  }
+
+
+  .sales-form-card .card-header {
+
+    display: none;
+
+  }
+
+
+  .sales-form-card .card-body {
+
+    padding: 0;
+
+  }
+
+}
