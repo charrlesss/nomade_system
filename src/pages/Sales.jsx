@@ -3,6 +3,55 @@ import Calendar from "react-calendar";
 import { useSearchParams } from "react-router-dom";
 import "react-calendar/dist/Calendar.css";
 import api from "../services/api";
+
+const getLocalDateString = (date) => {
+  if (!date) return "";
+
+  const d = new Date(date);
+
+  return (
+    d.getFullYear() +
+    "-" +
+    String(d.getMonth() + 1).padStart(2, "0") +
+    "-" +
+    String(d.getDate()).padStart(2, "0")
+  );
+};
+
+const formatApiDate = (date) => {
+  return (
+    date.getFullYear() +
+    "-" +
+    String(date.getMonth() + 1).padStart(2, "0") +
+    "-" +
+    String(date.getDate()).padStart(2, "0")
+  );
+};
+
+const getDateOnly = (date) => {
+  const d = new Date(date);
+
+  return (
+    d.getFullYear() +
+    "-" +
+    String(d.getMonth() + 1).padStart(2, "0") +
+    "-" +
+    String(d.getDate()).padStart(2, "0")
+  );
+};
+
+const getTodayDate = () => {
+  const date = new Date();
+
+  return (
+    date.getFullYear() +
+    "-" +
+    String(date.getMonth() + 1).padStart(2, "0") +
+    "-" +
+    String(date.getDate()).padStart(2, "0")
+  );
+};
+
 function SalesTracking() {
   const [searchParams] = useSearchParams();
   const business = searchParams.get("business");
@@ -28,7 +77,7 @@ function SalesTracking() {
   const [currentId, setCurrentId] = useState(null);
 
   const [form, setForm] = useState({
-    sales_date: new Date().toISOString().split("T")[0],
+    sales_date: getTodayDate(),
     gross_sales: "0.00",
     cash_sales: "0.00",
     gcash_sales: "0.00",
@@ -38,7 +87,7 @@ function SalesTracking() {
   });
 
   const emptyForm = {
-    sales_date: new Date().toISOString().split("T")[0],
+    sales_date: getTodayDate(),
     gross_sales: "0.00",
     cash_sales: "0.00",
     gcash_sales: "0.00",
@@ -73,14 +122,39 @@ function SalesTracking() {
 
   const loadSales = async (business, activeStartDate) => {
     setLoading(true);
-    const res = await api.get(`/sales/${business}/${activeStartDate}`);
 
-    console.log(res.data)
-    setSales(res.data.sales);
-    setSalesAnalytics(res.data.analytics[0]);
-    setTimeout(() => {
+    try {
+      const formattedDate = formatApiDate(activeStartDate);
+
+      console.log("Loading sales:", {
+        business,
+        activeStartDate,
+        formattedDate,
+      });
+
+      const res = await api.get(`/sales/${business}/${formattedDate}`);
+
+      console.log("SALES RESPONSE:", res.data);
+
+      setSales(res.data.sales || []);
+
+      setSalesAnalytics(
+        res.data.analytics?.[0] || {
+          gross_sales: "0.00",
+          cash_sales: "0.00",
+          gcash_sales: "0.00",
+          other_sales: "0.00",
+          cups: "0",
+          average_day: "0.00",
+          highest_sales: "0.00",
+          lowest_sales: "0.00",
+        },
+      );
+    } catch (err) {
+      console.error("LOAD SALES ERROR:", err);
+    } finally {
       setLoading(false);
-    }, 2000);
+    }
   };
 
   const handleChange = (e) => {
@@ -113,7 +187,6 @@ function SalesTracking() {
   };
 
   const handleCalendarChange = (date) => {
-
     setSelectedDate(date);
     const formatted =
       date.getFullYear() +
@@ -127,15 +200,15 @@ function SalesTracking() {
   };
 
   const loadSaleByDate = async (date, formatted) => {
+    const selectedDateString = getLocalDateString(date);
+
     const dateSaleIsFind = sales.some(
-      (item) =>
-        new Date(item.sales_date).getTime() === new Date(date).getTime(),
+      (item) => getLocalDateString(item.sales_date) === selectedDateString,
     );
 
     if (dateSaleIsFind) {
       const data = sales.filter(
-        (item) =>
-          new Date(item.sales_date).getTime() === new Date(date).getTime(),
+        (item) => getLocalDateString(item.sales_date) === selectedDateString,
       );
       setEditing(true);
       setCurrentId(data[0].daily_sales_id);
@@ -190,283 +263,291 @@ function SalesTracking() {
   };
 
   return (
-    <div className="container-fluid">
-      {/* <h3 className="mb-4">Sales Tracking</h3> */}
+    <div className="position-relative">
+      {loading && (
+        <div className="sales-loading-overlay">
+          <div className="spinner-border text-success" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
 
-      <div className="row">
-        {/* Calendar */}
+          <div className="mt-2 fw-semibold">Loading sales...</div>
+        </div>
+      )}
+      <div className="container-fluid ">
+        {/* <h3 className="mb-4">Sales Tracking</h3> */}
 
-        <div className="col-lg-6 mb-4 flex-fill">
-          <div className="card-body d-flex justify-content-center align-items-center">
-            <Calendar
-              value={selectedDate}
-              onChange={handleCalendarChange}
-              tileContent={({ date, view }) => {
-                const dateSaleIsFind = sales.some(
-                  (item) =>
-                    new Date(item.sales_date).getTime() ===
-                    new Date(date).getTime(),
-                );
+        <div className="row">
+          {/* Calendar */}
 
+          <div className="col-lg-6 mb-4 flex-fill">
+            <div className="card-body d-flex justify-content-center align-items-center">
+              <Calendar
+                value={selectedDate}
+                onChange={handleCalendarChange}
+                tileContent={({ date, view }) => {
+                  if (view !== "month") return null;
 
-                if (view === "month" && dateSaleIsFind) {
-                  const data = sales.filter(
-                    (item) =>
-                      new Date(item.sales_date).getTime() ===
-                      new Date(date).getTime(),
+                  const calendarDate = getDateOnly(date);
+
+                  const sale = sales.find(
+                    (item) => getDateOnly(item.sales_date) === calendarDate,
                   );
-                  const saleObj = data[0];
+
+                  if (!sale) return null;
+
                   return (
                     <>
-                      {saleObj.notes !== "" && (
-                        <div className="notes-sign"></div>
-                      )}
+                      {sale.notes !== "" && <div className="notes-sign"></div>}
+
                       <div className="calendar-tile-content">
-                        <p>₱{formatCurrency(saleObj.gross_sales)}</p>
-                        <p>☕︎ {saleObj.cups}</p>
+                        <p>₱{formatCurrency(sale.gross_sales)}</p>
+                        <p>☕︎ {sale.cups}</p>
                       </div>
                     </>
                   );
-                }
-
-                return null;
-              }}
-              onActiveStartDateChange={({ activeStartDate }) => {
-                console.log(activeStartDate)
-                setActiveStartDate(activeStartDate);
-              }}
-              showFixedNumberOfWeeks
-            />
+                }}
+                onActiveStartDateChange={({ activeStartDate }) => {
+                  console.log(activeStartDate);
+                  setActiveStartDate(activeStartDate);
+                }}
+                showFixedNumberOfWeeks
+              />
+            </div>
           </div>
-        </div>
 
-        {/* Today Sales */}
+          {/* Today Sales */}
 
-        <div className="col-lg-6 mb-2 " style={{ width: "250px" }}>
-          <div className="card shadow-sm">
-            <div className="card-header bg-success text-white">Today Sales</div>
-
-            <div className="card-body">
-              <div className="mb-1">
-                <label
-                  className="form-label fw-bold mb-1"
-                  style={{ fontSize: "13px" }}
-                >
-                  Selected Date
-                </label>
-
-                <input
-                  className="form-control"
-                  value={formatDisplayDate(form.sales_date)}
-                  readOnly
-                  style={{
-                    height: "23px",
-                    fontSize: "14px",
-                  }}
-                />
+          <div className="col-lg-6 mb-2 " style={{ width: "250px" }}>
+            <div className="card shadow-sm">
+              <div className="card-header bg-success text-white">
+                Today Sales
               </div>
 
-              <div className="mb-1">
-                <label
-                  className="form-label fw-bold mb-1"
-                  style={{ fontSize: "13px" }}
-                >
-                  Cash Sales
-                </label>
+              <div className="card-body">
+                <div className="mb-1">
+                  <label
+                    className="form-label fw-bold mb-1"
+                    style={{ fontSize: "13px" }}
+                  >
+                    Selected Date
+                  </label>
 
-                <input
-                  type="number"
-                  className="form-control"
-                  name="cash_sales"
-                  value={form.cash_sales}
-                  onChange={handleChange}
-                  style={{
-                    height: "23px",
-                    fontSize: "14px",
-                  }}
-                />
-              </div>
+                  <input
+                    className="form-control"
+                    value={formatDisplayDate(form.sales_date)}
+                    readOnly
+                    style={{
+                      height: "23px",
+                      fontSize: "14px",
+                    }}
+                  />
+                </div>
 
-              <div className="mb-1">
-                <label
-                  className="form-label fw-bold mb-1"
-                  style={{ fontSize: "13px" }}
-                >
-                  GCash Sales
-                </label>
+                <div className="mb-1">
+                  <label
+                    className="form-label fw-bold mb-1"
+                    style={{ fontSize: "13px" }}
+                  >
+                    Cash Sales
+                  </label>
 
-                <input
-                  type="number"
-                  className="form-control"
-                  name="gcash_sales"
-                  value={form.gcash_sales}
-                  onChange={handleChange}
-                  style={{
-                    height: "23px",
-                    fontSize: "14px",
-                  }}
-                />
-              </div>
+                  <input
+                    type="number"
+                    className="form-control"
+                    name="cash_sales"
+                    value={form.cash_sales}
+                    onChange={handleChange}
+                    style={{
+                      height: "23px",
+                      fontSize: "14px",
+                    }}
+                  />
+                </div>
 
-              <div className="mb-1">
-                <label
-                  className="form-label fw-bold mb-1"
-                  style={{ fontSize: "13px" }}
-                >
-                  Maya / Others
-                </label>
+                <div className="mb-1">
+                  <label
+                    className="form-label fw-bold mb-1"
+                    style={{ fontSize: "13px" }}
+                  >
+                    GCash Sales
+                  </label>
 
-                <input
-                  type="number"
-                  className="form-control"
-                  name="other_sales"
-                  value={form.other_sales}
-                  onChange={handleChange}
-                  style={{
-                    height: "23px",
-                    fontSize: "14px",
-                  }}
-                />
-              </div>
+                  <input
+                    type="number"
+                    className="form-control"
+                    name="gcash_sales"
+                    value={form.gcash_sales}
+                    onChange={handleChange}
+                    style={{
+                      height: "23px",
+                      fontSize: "14px",
+                    }}
+                  />
+                </div>
 
-              <div className="mb-1">
-                <label
-                  className="form-label fw-bold mb-1"
-                  style={{ fontSize: "13px" }}
-                >
-                  Gross Sales
-                </label>
+                <div className="mb-1">
+                  <label
+                    className="form-label fw-bold mb-1"
+                    style={{ fontSize: "13px" }}
+                  >
+                    Maya / Others
+                  </label>
 
-                <input
-                  type="number"
-                  className="form-control"
-                  name="gross_sales"
-                  value={form.gross_sales}
-                  onChange={handleChange}
-                  style={{
-                    height: "23px",
-                    fontSize: "14px",
-                  }}
-                />
-              </div>
+                  <input
+                    type="number"
+                    className="form-control"
+                    name="other_sales"
+                    value={form.other_sales}
+                    onChange={handleChange}
+                    style={{
+                      height: "23px",
+                      fontSize: "14px",
+                    }}
+                  />
+                </div>
 
-              <div className="mb-1">
-                <label
-                  className="form-label fw-bold mb-1"
-                  style={{ fontSize: "13px" }}
-                >
-                  Cups
-                </label>
+                <div className="mb-1">
+                  <label
+                    className="form-label fw-bold mb-1"
+                    style={{ fontSize: "13px" }}
+                  >
+                    Gross Sales
+                  </label>
 
-                <input
-                  type="number"
-                  className="form-control"
-                  name="cups"
-                  value={form.cups}
-                  onChange={handleChange}
-                  style={{
-                    height: "23px",
-                    fontSize: "14px",
-                  }}
-                />
-              </div>
+                  <input
+                    type="number"
+                    className="form-control"
+                    name="gross_sales"
+                    value={form.gross_sales}
+                    onChange={handleChange}
+                    style={{
+                      height: "23px",
+                      fontSize: "14px",
+                    }}
+                  />
+                </div>
 
-              <div className="mb-3">
-                <label
-                  className="form-label fw-bold mb-1"
-                  style={{ fontSize: "13px" }}
-                >
-                  Notes
-                </label>
+                <div className="mb-1">
+                  <label
+                    className="form-label fw-bold mb-1"
+                    style={{ fontSize: "13px" }}
+                  >
+                    Cups
+                  </label>
 
-                <textarea
-                  className="form-control"
-                  rows="3"
-                  name="notes"
-                  value={form.notes}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="d-flex flex-row justify-content-between">
-                <button
-                  className={`btn ${editing ? "btn-warning" : "btn-success"}`}
-                  onClick={saveSales}
-                >
-                  {editing ? "Update" : "Save Sales"}
-                </button>
-                {editing && (
-                  <button className="btn btn-danger ms-2" onClick={deleteSales}>
-                    Delete
+                  <input
+                    type="number"
+                    className="form-control"
+                    name="cups"
+                    value={form.cups}
+                    onChange={handleChange}
+                    style={{
+                      height: "23px",
+                      fontSize: "14px",
+                    }}
+                  />
+                </div>
+
+                <div className="mb-3">
+                  <label
+                    className="form-label fw-bold mb-1"
+                    style={{ fontSize: "13px" }}
+                  >
+                    Notes
+                  </label>
+
+                  <textarea
+                    className="form-control"
+                    rows="3"
+                    name="notes"
+                    value={form.notes}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="d-flex flex-row justify-content-between">
+                  <button
+                    className={`btn ${editing ? "btn-warning" : "btn-success"}`}
+                    onClick={saveSales}
+                  >
+                    {editing ? "Update" : "Save Sales"}
                   </button>
-                )}
+                  {editing && (
+                    <button
+                      className="btn btn-danger ms-2"
+                      onClick={deleteSales}
+                    >
+                      Delete
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Monthly Summary */}
+        {/* Monthly Summary */}
 
-      <div className="card shadow-sm">
-        <div className="card-header bg-dark text-white">
-          Total Sales This Month
-        </div>
+        <div className="card shadow-sm">
+          <div className="card-header bg-dark text-white">
+            Total Sales This Month
+          </div>
 
-        <div className="card-body">
-          <div className="row">
-            <div className="col-md-3 mb-3">
-              <div className="border rounded p-3 text-center">
-                <h6>Gross Sales</h6>
-                <h4>₱{formatCurrency(salesAnalytics.gross_sales)}</h4>
+          <div className="card-body">
+            <div className="row">
+              <div className="col-md-3 mb-3">
+                <div className="border rounded p-3 text-center">
+                  <h6>Gross Sales</h6>
+                  <h4>₱{formatCurrency(salesAnalytics.gross_sales)}</h4>
+                </div>
               </div>
-            </div>
 
-            <div className="col-md-3 mb-3">
-              <div className="border rounded p-3 text-center">
-                <h6>Cash Sales</h6>
-                <h4>₱{formatCurrency(salesAnalytics.cash_sales)}</h4>
+              <div className="col-md-3 mb-3">
+                <div className="border rounded p-3 text-center">
+                  <h6>Cash Sales</h6>
+                  <h4>₱{formatCurrency(salesAnalytics.cash_sales)}</h4>
+                </div>
               </div>
-            </div>
 
-            <div className="col-md-3 mb-3">
-              <div className="border rounded p-3 text-center">
-                <h6>GCash Sales</h6>
-                <h4>₱{formatCurrency(salesAnalytics.gcash_sales)}</h4>
+              <div className="col-md-3 mb-3">
+                <div className="border rounded p-3 text-center">
+                  <h6>GCash Sales</h6>
+                  <h4>₱{formatCurrency(salesAnalytics.gcash_sales)}</h4>
+                </div>
               </div>
-            </div>
 
-            <div className="col-md-3 mb-3">
-              <div className="border rounded p-3 text-center">
-                <h6>Other Payment Sales</h6>
-                <h4>₱{formatCurrency(salesAnalytics.other_sales)}</h4>
+              <div className="col-md-3 mb-3">
+                <div className="border rounded p-3 text-center">
+                  <h6>Other Payment Sales</h6>
+                  <h4>₱{formatCurrency(salesAnalytics.other_sales)}</h4>
+                </div>
               </div>
-            </div>
 
-            <div className="col-md-3 mb-3">
-              <div className="border rounded p-3 text-center">
-                <h6>Cups</h6>
-                <h4>{salesAnalytics.cups}</h4>
+              <div className="col-md-3 mb-3">
+                <div className="border rounded p-3 text-center">
+                  <h6>Cups</h6>
+                  <h4>{salesAnalytics.cups}</h4>
+                </div>
               </div>
-            </div>
 
-            <div className="col-md-3 mb-3">
-              <div className="border rounded p-3 text-center">
-                <h6>Average / Day</h6>
-                <h4>₱{formatCurrency(salesAnalytics.average_day)}</h4>
+              <div className="col-md-3 mb-3">
+                <div className="border rounded p-3 text-center">
+                  <h6>Average / Day</h6>
+                  <h4>₱{formatCurrency(salesAnalytics.average_day)}</h4>
+                </div>
               </div>
-            </div>
 
-            <div className="col-md-3 mb-3">
-              <div className="border rounded p-3 text-center">
-                <h6>Average / Cups</h6>
-                <h4>{formatCurrency(salesAnalytics.average_cups_day)}</h4>
+              <div className="col-md-3 mb-3">
+                <div className="border rounded p-3 text-center">
+                  <h6>Average / Cups</h6>
+                  <h4>{formatCurrency(salesAnalytics.average_cups_day)}</h4>
+                </div>
               </div>
-            </div>
 
-            <div className="col-md-3 mb-3">
-              <div className="border rounded p-3 text-center">
-                <h6>Lowest Sales</h6>
-                <h4>₱{formatCurrency(salesAnalytics.lowest_sales)}</h4>
+              <div className="col-md-3 mb-3">
+                <div className="border rounded p-3 text-center">
+                  <h6>Lowest Sales</h6>
+                  <h4>₱{formatCurrency(salesAnalytics.lowest_sales)}</h4>
+                </div>
               </div>
             </div>
           </div>

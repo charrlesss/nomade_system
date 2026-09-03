@@ -13,6 +13,7 @@ function Expenses() {
   const [showReportModal, setShowReportModal] = useState(false);
 
   const [editingExpense, setEditingExpense] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     loadExpenses(business);
@@ -23,11 +24,15 @@ function Expenses() {
   // ==========================
 
   const loadExpenses = async (business) => {
+    setLoading(true);
+
     try {
       const res = await api.get(`/expenses/${business}`);
-      setExpenses(res.data.expenses);
+      setExpenses(res.data.expenses || []);
     } catch (err) {
       console.log(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -74,106 +79,123 @@ function Expenses() {
   };
 
   return (
-    <div className="container-fluid">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h3>Expenses</h3>
-        <div className="d-flex gap-2">
-          <button
-            className="btn btn-secondary"
-            onClick={() => setShowReportModal(true)}
-          >
-            Create Report
-          </button>
+    <div className="position-relative" style={{position:"relative"}}>
+      {loading && (
+        <div className="sales-loading-overlay">
+          <div className="spinner-border text-success" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
 
-          <button className="btn btn-primary" onClick={addExpense}>
-            + Add Expense
-          </button>
+          <div className="mt-2 fw-semibold">Loading expenses...</div>
         </div>
-      </div>
+      )}
+      <div className="container-fluid">
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <div className="d-flex gap-2">
+            <button
+              className="btn btn-secondary"
+              onClick={() => setShowReportModal(true)}
+            >
+              Create Report
+            </button>
 
-      <table className="table table-bordered table-hover">
-        <thead className="table-dark">
-          <tr>
-            <th>Date</th>
+            <button className="btn btn-primary" onClick={addExpense}>
+              + Add Expense
+            </button>
+          </div>
+        </div>
 
-            <th>Category</th>
+        {loading ? null : (
+          <table className="table table-bordered table-hover">
+            <thead className="table-dark">
+              <tr>
+                <th>Date</th>
 
-            <th>Expense</th>
+                <th>Category</th>
 
-            <th className="text-end">Amount</th>
+                <th>Expense</th>
 
-            <th>Payment</th>
+                <th className="text-end">Amount</th>
 
-            <th>Recurring</th>
+                <th>Payment</th>
 
-            <th width="170">Action</th>
-          </tr>
-        </thead>
+                <th>Recurring</th>
 
-        <tbody>
-          {expenses.length === 0 ? (
-            <tr>
-              <td colSpan="8" className="text-center">
-                No Expenses Found
-              </td>
-            </tr>
-          ) : (
-            expenses.map((expense) => (
-              <tr key={expense.expenses_id}>
-                <td>
-                  {new Date(expense.expense_date).toLocaleDateString("en-PH", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </td>
-
-                <td>{expense.category}</td>
-
-                <td>{expense.expense_name}</td>
-
-                <td className="text-end">
-                  ₱{Number(expense.amount).toFixed(2)}
-                </td>
-
-                <td>{expense.payment_method}</td>
-
-                <td>{expense.is_recurring ? expense.recurring_type : "-"}</td>
-
-                <td>
-                  <button
-                    className="btn btn-warning btn-sm me-2"
-                    onClick={() => editExpense(expense)}
-                  >
-                    Edit
-                  </button>
-
-                  <button
-                    className="btn btn-danger btn-sm"
-                    onClick={() => deleteExpense(expense.expenses_id)}
-                  >
-                    Delete
-                  </button>
-                </td>
+                <th width="170">Action</th>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            </thead>
 
-      <ExpensesModal
-        show={showModal}
-        onClose={() => setShowModal(false)}
-        onSaved={loadExpenses}
-        editingExpense={editingExpense}
-        business={business}
-      />
+            <tbody>
+              {expenses.length === 0 ? (
+                <tr>
+                  <td colSpan="8" className="text-center">
+                    No Expenses Found
+                  </td>
+                </tr>
+              ) : (
+                expenses.map((expense) => (
+                  <tr key={expense.expenses_id}>
+                    <td>
+                      {new Date(expense.expense_date).toLocaleDateString(
+                        "en-PH",
+                        {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        },
+                      )}
+                    </td>
 
-      <ExpenseReportModal
-        show={showReportModal}
-        onClose={() => setShowReportModal(false)}
-        businessId={business}
-      />
+                    <td>{expense.category}</td>
+
+                    <td>{expense.expense_name}</td>
+
+                    <td className="text-end">
+                      ₱{Number(expense.amount).toFixed(2)}
+                    </td>
+
+                    <td>{expense.payment_method}</td>
+
+                    <td>
+                      {expense.is_recurring ? expense.recurring_type : "-"}
+                    </td>
+
+                    <td>
+                      <button
+                        className="btn btn-warning btn-sm me-2"
+                        onClick={() => editExpense(expense)}
+                      >
+                        Edit
+                      </button>
+
+                      <button
+                        className="btn btn-danger btn-sm"
+                        onClick={() => deleteExpense(expense.expenses_id)}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        )}
+
+        <ExpensesModal
+          show={showModal}
+          onClose={() => setShowModal(false)}
+          onSaved={loadExpenses}
+          editingExpense={editingExpense}
+          business={business}
+        />
+
+        <ExpenseReportModal
+          show={showReportModal}
+          onClose={() => setShowReportModal(false)}
+          businessId={business}
+        />
+      </div>
     </div>
   );
 }
