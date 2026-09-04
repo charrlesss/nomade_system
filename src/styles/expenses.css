@@ -6,7 +6,6 @@
   width: 100%;
 }
 
-
 /* ========================================
    HEADER
 ======================================== */
@@ -31,48 +30,39 @@
   gap: 8px;
 }
 
-
 /* ========================================
    EXPENSES TABLE
 ======================================== */
 
-.expenses-table-wrapper {
-  width: 100%;
-  max-width: 100%;
-
-  overflow-x: auto;
-  overflow-y: hidden;
-
-  -webkit-overflow-scrolling: touch;
-
-  display: block;
-}
+/* =========================================
+   EXPENSE TABLE
+========================================= */
 
 .expenses-table {
-  width: 100%;
-  margin-bottom: 0;
-
-  vertical-align: middle;
-
-  /* Important */
-  min-width: 900px;
+  font-size: 13px;
 }
 
-.expenses-table th,
-.expenses-table td {
+.expenses-table thead th {
+  padding: 6px 8px !important;
+  height: 30px;
+  vertical-align: middle;
   white-space: nowrap;
 }
 
-.expenses-table th {
+.expenses-table tbody td {
+  padding: 2px 8px !important;
+  height: auto;
   vertical-align: middle;
 }
 
-.expenses-table td {
-  vertical-align: middle;
+.expenses-table .btn-sm {
+  padding: 2px 7px;
+  font-size: 12px;
+  line-height: 1.4;
 }
 
-.expenses-action-column {
-  min-width: 150px;
+.expenses-table-wrapper {
+  overflow-x: auto;
 }
 
 /* ========================================
@@ -93,10 +83,8 @@
 
   margin-bottom: 12px;
 
-  box-shadow:
-    0 2px 6px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
 }
-
 
 /* ========================================
    CARD HEADER
@@ -138,7 +126,6 @@
   white-space: nowrap;
 }
 
-
 /* ========================================
    DETAILS
 ======================================== */
@@ -172,7 +159,6 @@
   word-break: break-word;
 }
 
-
 /* ========================================
    CARD ACTIONS
 ======================================== */
@@ -190,7 +176,6 @@
 .expense-card-actions button {
   flex: 1;
 }
-
 
 /* ========================================
    EMPTY STATE
@@ -210,14 +195,12 @@
   color: #6c757d;
 }
 
-
 /* ========================================
    TABLET
    768px - 1199px
 ======================================== */
 
 @media (max-width: 1199.98px) {
-
   .expenses-table-wrapper {
     /* display: none; */
   }
@@ -225,9 +208,7 @@
   .expenses-mobile-list {
     display: block;
   }
-
 }
-
 
 /* ========================================
    MOBILE
@@ -235,6 +216,11 @@
 ======================================== */
 
 @media (max-width: 767.98px) {
+  .expenses-main-content {
+    display: flex;
+    flex-direction: column-reverse;
+    row-gap: 20px;
+  }
 
   .expenses-header {
     flex-direction: column;
@@ -244,11 +230,9 @@
     margin-bottom: 15px;
   }
 
-
   .expenses-title {
     font-size: 20px;
   }
-
 
   .expenses-actions {
     display: flex;
@@ -256,11 +240,9 @@
     width: 100%;
   }
 
-
   .expenses-actions .btn {
     flex: 1;
   }
-
 
   .expense-card {
     padding: 14px;
@@ -268,44 +250,35 @@
     border-radius: 10px;
   }
 
-
   .expense-card-header {
     gap: 10px;
   }
-
 
   .expense-card-name {
     font-size: 16px;
   }
 
-
   .expense-card-amount {
     font-size: 16px;
   }
-
 }
-
 
 /* ========================================
    SMALL MOBILE
 ======================================== */
 
 @media (max-width: 480px) {
-
   .expenses-actions {
     flex-direction: column;
   }
-
 
   .expenses-actions .btn {
     width: 100%;
   }
 
-
   .expense-card-header {
     flex-direction: column;
   }
-
 
   .expense-card-amount {
     align-self: flex-start;
@@ -313,14 +286,11 @@
     font-size: 18px;
   }
 
-
   .expense-detail {
     align-items: flex-start;
   }
 
-
   .expense-detail-value {
     max-width: 60%;
   }
-
 }

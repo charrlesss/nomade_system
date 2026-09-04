@@ -73,39 +73,39 @@ function ExpensesModal({ show, onClose, onSaved, editingExpense, business }) {
 
   return (
     <div
-      className="modal fade show"
+      className="modal fade show stock-modal-main"
       style={{
         display: "block",
         backgroundColor: "rgba(0,0,0,.5)",
       }}
     >
-      <div className="modal-dialog modal-lg">
+      <div className="modal-dialog modal-md">
         <div className="modal-content">
           <div className="modal-header">
             <h5 className="modal-title">
               {editingExpense ? "Edit Expense" : "Add Expense"}
             </h5>
 
-            <button className="btn-close" onClick={onClose}></button>
+            <button className="btn-close " onClick={onClose}></button>
           </div>
 
           <div className="modal-body">
             <div className="row">
-              <div className="col-md-6 mb-3">
+              <div className="col-md-6 mb-1">
                 <label className="form-label">Expense Date</label>
                 <input
                   type="date"
-                  className="form-control"
+                  className="form-control stock-modal-field"
                   name="expense_date"
                   value={form.expense_date}
                   onChange={handleChange}
                 />
               </div>
 
-              <div className="col-md-6 mb-3">
+              <div className="col-md-6 mb-1">
                 <label className="form-label">Category</label>
                 <select
-                  className="form-select"
+                  className="form-select stock-modal-field"
                   name="category"
                   value={form.category}
                   onChange={handleChange}
@@ -136,12 +136,12 @@ function ExpensesModal({ show, onClose, onSaved, editingExpense, business }) {
               </div>
             </div>
 
-            <div className="mb-3">
+            <div className="mb-1">
               <label className="form-label">Expense Name</label>
 
               <input
                 type="text"
-                className="form-control"
+                className="form-control stock-modal-field"
                 name="expense_name"
                 value={form.expense_name}
                 onChange={handleChange}
@@ -150,12 +150,12 @@ function ExpensesModal({ show, onClose, onSaved, editingExpense, business }) {
             </div>
 
             <div className="row">
-              <div className="col-md-6 mb-3">
+              <div className="col-md-6 mb-1">
                 <label className="form-label">Amount</label>
 
                 <input
                   type="number"
-                  className="form-control"
+                  className="form-control stock-modal-field"
                   name="amount"
                   value={form.amount}
                   onChange={handleChange}
@@ -163,11 +163,11 @@ function ExpensesModal({ show, onClose, onSaved, editingExpense, business }) {
                 />
               </div>
 
-              <div className="col-md-6 mb-3">
+              <div className="col-md-6 mb-1">
                 <label className="form-label">Payment Method</label>
 
                 <select
-                  className="form-select"
+                  className="form-select stock-modal-field"
                   name="payment_method"
                   value={form.payment_method}
                   onChange={handleChange}
@@ -183,9 +183,9 @@ function ExpensesModal({ show, onClose, onSaved, editingExpense, business }) {
               </div>
             </div>
 
-            <div className="form-check mb-3">
+            <div className="form-check mb-1">
               <input
-                className="form-check-input"
+                className="form-check-input "
                 type="checkbox"
                 name="is_recurring"
                 checked={form.is_recurring}
@@ -196,11 +196,11 @@ function ExpensesModal({ show, onClose, onSaved, editingExpense, business }) {
             </div>
 
             {form.is_recurring && (
-              <div className="mb-3">
+              <div className="mb-1">
                 <label className="form-label">Recurring Type</label>
 
                 <select
-                  className="form-select"
+                  className="form-select stock-modal-field"
                   name="recurring_type"
                   value={form.recurring_type}
                   onChange={handleChange}
@@ -214,12 +214,12 @@ function ExpensesModal({ show, onClose, onSaved, editingExpense, business }) {
               </div>
             )}
 
-            <div className="mb-3">
+            <div className="mb-1">
               <label className="form-label">Notes</label>
 
               <textarea
-                className="form-control"
-                rows="3"
+                className="form-control stock-modal-field"
+                rows="2"
                 name="notes"
                 value={form.notes}
                 onChange={handleChange}
@@ -229,11 +229,11 @@ function ExpensesModal({ show, onClose, onSaved, editingExpense, business }) {
           </div>
 
           <div className="modal-footer">
-            <button className="btn btn-secondary" onClick={onClose}>
+            <button className="btn btn-secondary btn-sm" onClick={onClose}>
               Cancel
             </button>
 
-            <button className="btn btn-primary" onClick={save}>
+            <button className="btn btn-primary btn-sm" onClick={save}>
               {editingExpense ? "Update Expense" : "Save Expense"}
             </button>
           </div>

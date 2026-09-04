@@ -23,21 +23,40 @@ function Sidebar() {
     });
   }, []);
 
+  // =================================
+  // CLOSE MOBILE SIDEBAR
+  // =================================
+
+  const closeMobileSidebar = () => {
+    const sidebar = document.getElementById("toggle-sidebar");
+    if (!sidebar) return;
+
+    sidebar.click();
+  };
+
   return (
     <>
       {/* =========================
           MOBILE NAVBAR
       ========================== */}
-      <nav className="navbar navbar-dark bg-dark d-lg-none ">
-        <div className="container-fluid">
+
+      <nav
+        className="navbar navbar-dark bg-dark d-lg-none p-0 m-0"
+        style={{ height: "50px" }}
+      >
+        <div className="container-fluid  ">
           <button
-            className="navbar-toggler"
+            id="toggle-sidebar"
+            className="navbar-toggler btn-sm"
             type="button"
             data-bs-toggle="offcanvas"
             data-bs-target="#mobileSidebar"
             aria-controls="mobileSidebar"
+            style={{
+              fontSize: "12px",
+            }}
           >
-            <span className="navbar-toggler-icon"></span>
+            <span className="navbar-toggler-icon "></span>
           </button>
         </div>
       </nav>
@@ -45,6 +64,7 @@ function Sidebar() {
       {/* =========================
           MOBILE OFFCANVAS
       ========================== */}
+
       <div
         className="offcanvas offcanvas-start bg-dark text-white"
         tabIndex="-1"
@@ -54,7 +74,7 @@ function Sidebar() {
         <div className="offcanvas-header">
           <button
             type="button"
-            className="btn-close btn-close-white"
+            className="btn-close btn-close-white btn-sm"
             data-bs-dismiss="offcanvas"
             aria-label="Close"
           ></button>
@@ -65,6 +85,7 @@ function Sidebar() {
             withBusiness={withBusiness}
             costingOpen={costingOpen}
             setCostingOpen={setCostingOpen}
+            closeMobileSidebar={closeMobileSidebar}
           />
         </div>
       </div>
@@ -72,6 +93,7 @@ function Sidebar() {
       {/* =========================
           DESKTOP SIDEBAR
       ========================== */}
+
       <aside className="sidebar-desktop bg-dark text-white">
         <div className="sidebar-content">
           <SidebarLinks
@@ -89,28 +111,67 @@ function Sidebar() {
    SIDEBAR LINKS
 ================================= */
 
-function SidebarLinks({ withBusiness, costingOpen, setCostingOpen }) {
+function SidebarLinks({
+  withBusiness,
+  costingOpen,
+  setCostingOpen,
+  closeMobileSidebar,
+}) {
+  // =================================
+  // HANDLE LINK CLICK
+  // =================================
+
+  const handleLinkClick = () => {
+    if (closeMobileSidebar) {
+      closeMobileSidebar();
+    }
+  };
+
   return (
     <div className="sidebar-links">
-      {/* SALES */}
-      <Link className="sidebar-link" to={withBusiness("/")}>
+      {/* =========================
+          SALES
+      ========================== */}
+
+      <Link
+        className="sidebar-link"
+        to={withBusiness("/")}
+        onClick={handleLinkClick}
+      >
         <span>📊</span>
         <span>Sales</span>
       </Link>
 
-      {/* STOCKS */}
-      <Link className="sidebar-link" to={withBusiness("/stocks")}>
+      {/* =========================
+          STOCKS
+      ========================== */}
+
+      <Link
+        className="sidebar-link"
+        to={withBusiness("/stocks")}
+        onClick={handleLinkClick}
+      >
         <span>📦</span>
         <span>Stocks</span>
       </Link>
 
-      {/* EXPENSES */}
-      <Link className="sidebar-link" to={withBusiness("/expenses")}>
+      {/* =========================
+          EXPENSES
+      ========================== */}
+
+      <Link
+        className="sidebar-link"
+        to={withBusiness("/expenses")}
+        onClick={handleLinkClick}
+      >
         <span>💰</span>
         <span>Expenses</span>
       </Link>
 
-      {/* COSTING */}
+      {/* =========================
+          COSTING
+      ========================== */}
+
       <button
         type="button"
         className="sidebar-link sidebar-button"
@@ -123,25 +184,40 @@ function SidebarLinks({ withBusiness, costingOpen, setCostingOpen }) {
         <span>{costingOpen ? "▾" : "▸"}</span>
       </button>
 
-      {/* COSTING SUB MENU */}
+      {/* =========================
+          COSTING SUB MENU
+      ========================== */}
+
       {costingOpen && (
         <div className="costing-submenu">
+          {/* FORMULAS */}
+
           <Link
             className="sidebar-sublink"
             to={withBusiness("/costing/formulas")}
+            onClick={handleLinkClick}
           >
             <span>•</span>
             <span>Formulas</span>
           </Link>
 
-          <Link className="sidebar-sublink" to={withBusiness("/costing/items")}>
+          {/* ITEMS */}
+
+          <Link
+            className="sidebar-sublink"
+            to={withBusiness("/costing/items")}
+            onClick={handleLinkClick}
+          >
             <span>•</span>
             <span>Items</span>
           </Link>
 
+          {/* CATEGORIES */}
+
           <Link
             className="sidebar-sublink"
             to={withBusiness("/costing/categories")}
+            onClick={handleLinkClick}
           >
             <span>•</span>
             <span>Categories</span>

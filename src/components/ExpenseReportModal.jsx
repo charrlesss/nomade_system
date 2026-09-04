@@ -165,7 +165,7 @@ function ExpenseReportModal({ show, onClose, businessId }) {
 
   return (
     <div
-      className="modal fade show"
+      className="modal fade show stock-modal-main"
       style={{
         display: "block",
         backgroundColor: "rgba(0,0,0,.5)",
@@ -186,11 +186,11 @@ function ExpenseReportModal({ show, onClose, businessId }) {
           <div className="modal-body">
             {/* REPORT TYPE */}
 
-            <div className="mb-3">
+            <div className="mb-1">
               <label className="form-label">Report Type</label>
 
               <select
-                className="form-select"
+                className="form-select stock-modal-field"
                 name="report_type"
                 value={form.report_type}
                 onChange={handleChange}
@@ -208,13 +208,13 @@ function ExpenseReportModal({ show, onClose, businessId }) {
 
             {/* DATE */}
 
-            <div className="mb-3">
+            <div className="mb-1">
               <label className="form-label">Date</label>
 
               {form.report_type === "daily" && (
                 <input
                   type="date"
-                  className="form-control"
+                  className="form-control stock-modal-field"
                   name="report_date"
                   value={form.report_date}
                   onChange={handleChange}
@@ -225,7 +225,7 @@ function ExpenseReportModal({ show, onClose, businessId }) {
                 form.report_type === "monthly_summary") && (
                 <input
                   type="month"
-                  className="form-control"
+                  className="form-control stock-modal-field"
                   name="report_date"
                   value={form.report_date}
                   onChange={handleChange}
@@ -234,7 +234,7 @@ function ExpenseReportModal({ show, onClose, businessId }) {
 
               {form.report_type === "yearly" && (
                 <select
-                  className="form-select"
+                  className="form-select stock-modal-field"
                   name="report_date"
                   value={form.report_date}
                   onChange={handleChange}
@@ -254,11 +254,11 @@ function ExpenseReportModal({ show, onClose, businessId }) {
 
             {/* CATEGORY */}
 
-            <div className="mb-3">
+            <div className="mb-1">
               <label className="form-label">Category</label>
 
               <select
-                className="form-select"
+                className="form-select stock-modal-field"
                 name="category"
                 value={form.category}
                 onChange={handleChange}
@@ -298,7 +298,7 @@ function ExpenseReportModal({ show, onClose, businessId }) {
 
           <div className="modal-footer">
             <button
-              className="btn btn-secondary"
+              className="btn btn-secondary btn-sm"
               onClick={onClose}
               disabled={loading}
             >
@@ -306,7 +306,7 @@ function ExpenseReportModal({ show, onClose, businessId }) {
             </button>
 
             <button
-              className="btn btn-primary"
+              className="btn btn-primary btn-sm"
               onClick={generateReport}
               disabled={loading}
             >

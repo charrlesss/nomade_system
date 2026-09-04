@@ -4,7 +4,8 @@ import { useSearchParams } from "react-router-dom";
 import "react-calendar/dist/Calendar.css";
 import api from "../services/api";
 import "../styles/sales.css";
-
+import "../styles/stock.css";
+import SalesReportModal from "../components/SalesReportModal";
 // ========================================
 // DATE HELPERS
 // ========================================
@@ -110,6 +111,8 @@ function SalesTracking() {
   // ========================================
 
   const [showSalesModal, setShowSalesModal] = useState(false);
+
+  const [showReport, setShowReport] = useState(false);
 
   // ========================================
   // FORM
@@ -400,17 +403,78 @@ function SalesTracking() {
         </div>
       )}
 
-      <div className="container-fluid sales-page">
+      <div className="sale-main-content">
         {/* ====================================
-            CALENDAR + SALES
+            MONTHLY SUMMARY
         ===================================== */}
 
-        <div className="row g-3">
+        <div className="row g-3 mb-3">
+          {/* GROSS */}
+
+          <div className="col-md-4">
+            <div className="card shadow-sm h-100">
+              <div className="card-body">
+                <div className="text-muted small fw-bold">Gross Sales</div>
+
+                <h6 className="mb-0 mt-1">
+                  ₱{formatCurrency(salesAnalytics.gross_sales)}
+                </h6>
+              </div>
+            </div>
+          </div>
+
+          {/* AVERAGE DAY */}
+
+          <div className="col-md-4">
+            <div className="card shadow-sm h-100">
+              <div className="card-body">
+                <div className="text-muted small fw-bold">Average / Day</div>
+
+                <h6 className="mb-0 mt-1">
+                  ₱{formatCurrency(salesAnalytics.average_day)}
+                </h6>
+              </div>
+            </div>
+          </div>
+
+          {/* AVERAGE CUPS */}
+
+          <div className="col-md-4">
+            <div className="card shadow-sm h-100">
+              <div className="card-body">
+                <div className="text-muted small fw-bold">Average / Cups</div>
+
+                <h6 className="mb-0 mt-1">
+                  ₱{formatCurrency(salesAnalytics.average_cups_day)}
+                </h6>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="container-fluid sales-page">
+          <div className="mb-2  d-flex gap-2">
+            <button
+              className={`btn  btn-secondary btn-sm`}
+              onClick={() => setShowReport(true)}
+              style={{ fontSize: "12px" }}
+            >
+              Generate Report
+            </button>
+            <button
+              className={`btn btn-sm ${editing ? "btn-warning" : "btn-success"}`}
+              onClick={() => setShowSalesModal(true)}
+              style={{ fontSize: "12px" }}
+            >
+              {editing ? "Edit Sales" : "Add Sales"}
+            </button>
+          </div>
+
           {/* ==================================
               CALENDAR
           ================================== */}
 
-          <div className="col-12 col-xl-8">
+          <div className="container-fluid p-0">
             <div className="calendar-wrapper">
               <Calendar
                 value={selectedDate}
@@ -448,170 +512,55 @@ function SalesTracking() {
                 showFixedNumberOfWeeks
               />
             </div>
-
-            {/* ==================================
-                TABLET / MOBILE BUTTON
-            ================================== */}
-
-            <div className="sales-form-trigger d-xl-none">
-              <button
-                className={`btn ${
-                  editing ? "btn-warning" : "btn-success"
-                } w-100`}
-                onClick={() => setShowSalesModal(true)}
-              >
-                {editing ? "Edit Sales" : "Add Sales"}
-              </button>
-            </div>
-          </div>
-
-          {/* ==================================
-              DESKTOP SALES FORM
-          ================================== */}
-
-          <div className="col-12 col-xl-4 desktop-sales-form">
-            <SalesForm
-              form={form}
-              editing={editing}
-              handleChange={handleChange}
-              saveSales={saveSales}
-              deleteSales={deleteSales}
-              formatDisplayDate={formatDisplayDate}
-            />
-          </div>
-        </div>
-
-        {/* ====================================
-            TABLET / MOBILE MODAL
-        ===================================== */}
-
-        {showSalesModal && (
-          <div className="sales-modal-backdrop" onClick={closeSalesModal}>
-            <div className="sales-modal" onClick={(e) => e.stopPropagation()}>
-              {/* MODAL HEADER */}
-
-              <div className="sales-modal-header">
-                <h5 className="mb-0 fw-bold">
-                  {editing ? "Edit Sales" : "Add Sales"}
-                </h5>
-
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={closeSalesModal}
-                ></button>
-              </div>
-
-              {/* MODAL BODY */}
-
-              <div className="sales-modal-body">
-                <SalesForm
-                  form={form}
-                  editing={editing}
-                  handleChange={handleChange}
-                  saveSales={saveSales}
-                  deleteSales={deleteSales}
-                  formatDisplayDate={formatDisplayDate}
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ====================================
-            MONTHLY SUMMARY
-        ===================================== */}
-
-        <div className="card shadow-sm mt-3">
-          <div className="card-header bg-dark text-white">
-            Total Sales This Month
-          </div>
-
-          <div className="card-body">
-            <div className="row">
-              {/* GROSS */}
-
-              <div className="col-12 col-sm-6 col-lg-3 mb-3">
-                <div className="border rounded p-3 text-center">
-                  <h6>Gross Sales</h6>
-
-                  <h4>₱{formatCurrency(salesAnalytics.gross_sales)}</h4>
-                </div>
-              </div>
-
-              {/* CASH */}
-
-              <div className="col-12 col-sm-6 col-lg-3 mb-3">
-                <div className="border rounded p-3 text-center">
-                  <h6>Cash Sales</h6>
-
-                  <h4>₱{formatCurrency(salesAnalytics.cash_sales)}</h4>
-                </div>
-              </div>
-
-              {/* GCASH */}
-
-              <div className="col-12 col-sm-6 col-lg-3 mb-3">
-                <div className="border rounded p-3 text-center">
-                  <h6>GCash Sales</h6>
-
-                  <h4>₱{formatCurrency(salesAnalytics.gcash_sales)}</h4>
-                </div>
-              </div>
-
-              {/* OTHER */}
-
-              <div className="col-12 col-sm-6 col-lg-3 mb-3">
-                <div className="border rounded p-3 text-center">
-                  <h6>Other Payment Sales</h6>
-
-                  <h4>₱{formatCurrency(salesAnalytics.other_sales)}</h4>
-                </div>
-              </div>
-
-              {/* CUPS */}
-
-              <div className="col-12 col-sm-6 col-lg-3 mb-3">
-                <div className="border rounded p-3 text-center">
-                  <h6>Cups</h6>
-
-                  <h4>{salesAnalytics.cups}</h4>
-                </div>
-              </div>
-
-              {/* AVERAGE DAY */}
-
-              <div className="col-12 col-sm-6 col-lg-3 mb-3">
-                <div className="border rounded p-3 text-center">
-                  <h6>Average / Day</h6>
-
-                  <h4>₱{formatCurrency(salesAnalytics.average_day)}</h4>
-                </div>
-              </div>
-
-              {/* AVERAGE CUPS */}
-
-              <div className="col-12 col-sm-6 col-lg-3 mb-3">
-                <div className="border rounded p-3 text-center">
-                  <h6>Average / Cups</h6>
-
-                  <h4>{formatCurrency(salesAnalytics.average_cups_day)}</h4>
-                </div>
-              </div>
-
-              {/* LOWEST */}
-
-              <div className="col-12 col-sm-6 col-lg-3 mb-3">
-                <div className="border rounded p-3 text-center">
-                  <h6>Lowest Sales</h6>
-
-                  <h4>₱{formatCurrency(salesAnalytics.lowest_sales)}</h4>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
+
+      {/* ====================================
+            TABLET / MOBILE MODAL
+        ===================================== */}
+      {showSalesModal && (
+        <div
+          className="sales-modal-backdrop stock-modal-main"
+          onClick={closeSalesModal}
+        >
+          <div className="sales-modal" onClick={(e) => e.stopPropagation()}>
+            {/* MODAL HEADER */}
+
+            <div className="sales-modal-header  ">
+              <h5 className="mb-0 fw-bold">
+                {editing ? "Edit Sales" : "Add Sales"}
+              </h5>
+
+              <button
+                type="button"
+                className="btn-close"
+                onClick={closeSalesModal}
+              ></button>
+            </div>
+
+            {/* MODAL BODY */}
+
+            <div className="sales-modal-body py-2">
+              <SalesForm
+                form={form}
+                editing={editing}
+                handleChange={handleChange}
+                saveSales={saveSales}
+                deleteSales={deleteSales}
+                formatDisplayDate={formatDisplayDate}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showReport && (
+        <SalesReportModal
+          businessId={business}
+          onClose={() => setShowReport(false)}
+        />
+      )}
     </div>
   );
 }
@@ -629,150 +578,144 @@ function SalesForm({
   formatDisplayDate,
 }) {
   return (
-    <div className="card shadow-sm sales-form-card">
+    <div className=" shadow-sm sales-form-card">
       {/* HEADER */}
-
-      <div className="card-header bg-success text-white">
-        <strong>Today Sales</strong>
-      </div>
 
       {/* BODY */}
 
-      <div className="card-body">
-        {/* ==================================
+      {/* ==================================
             DATE
         ================================== */}
 
-        <div className="mb-3">
-          <label className="form-label fw-bold">Selected Date</label>
+      <div className="mb-1">
+        <label className="form-label fw-bold">Selected Date</label>
 
-          <input
-            className="form-control"
-            value={formatDisplayDate(form.sales_date)}
-            readOnly
-          />
-        </div>
+        <input
+          className="form-control stock-modal-field"
+          value={formatDisplayDate(form.sales_date)}
+          readOnly
+        />
+      </div>
 
-        {/* ==================================
+      {/* ==================================
             CASH
         ================================== */}
 
-        <div className="mb-3">
-          <label className="form-label fw-bold">Cash Sales</label>
+      <div className="mb-1">
+        <label className="form-label fw-bold">Cash Sales</label>
 
-          <input
-            type="number"
-            className="form-control"
-            name="cash_sales"
-            value={form.cash_sales}
-            onChange={handleChange}
-            step="0.01"
-          />
-        </div>
+        <input
+          type="number"
+          className="form-control stock-modal-field"
+          name="cash_sales"
+          value={form.cash_sales}
+          onChange={handleChange}
+          step="0.01"
+        />
+      </div>
 
-        {/* ==================================
+      {/* ==================================
             GCASH
         ================================== */}
 
-        <div className="mb-3">
-          <label className="form-label fw-bold">GCash Sales</label>
+      <div className="mb-1">
+        <label className="form-label fw-bold">GCash Sales</label>
 
-          <input
-            type="number"
-            className="form-control"
-            name="gcash_sales"
-            value={form.gcash_sales}
-            onChange={handleChange}
-            step="0.01"
-          />
-        </div>
+        <input
+          type="number"
+          className="form-control stock-modal-field"
+          name="gcash_sales"
+          value={form.gcash_sales}
+          onChange={handleChange}
+          step="0.01"
+        />
+      </div>
 
-        {/* ==================================
+      {/* ==================================
             MAYA / OTHERS
         ================================== */}
 
-        <div className="mb-3">
-          <label className="form-label fw-bold">Maya / Others</label>
+      <div className="mb-1">
+        <label className="form-label fw-bold">Maya / Others</label>
 
-          <input
-            type="number"
-            className="form-control"
-            name="other_sales"
-            value={form.other_sales}
-            onChange={handleChange}
-            step="0.01"
-          />
-        </div>
+        <input
+          type="number"
+          className="form-control stock-modal-field"
+          name="other_sales"
+          value={form.other_sales}
+          onChange={handleChange}
+          step="0.01"
+        />
+      </div>
 
-        {/* ==================================
+      {/* ==================================
             GROSS SALES
         ================================== */}
 
-        <div className="mb-3">
-          <label className="form-label fw-bold">Gross Sales</label>
+      <div className="mb-1">
+        <label className="form-label fw-bold">Gross Sales</label>
 
-          <input
-            type="number"
-            className="form-control"
-            name="gross_sales"
-            value={form.gross_sales}
-            onChange={handleChange}
-            step="0.01"
-          />
-        </div>
+        <input
+          type="number"
+          className="form-control stock-modal-field"
+          name="gross_sales"
+          value={form.gross_sales}
+          onChange={handleChange}
+          step="0.01"
+        />
+      </div>
 
-        {/* ==================================
+      {/* ==================================
             CUPS
         ================================== */}
 
-        <div className="mb-3">
-          <label className="form-label fw-bold">Cups</label>
+      <div className="mb-1">
+        <label className="form-label fw-bold stock-modal-field">Cups</label>
 
-          <input
-            type="number"
-            className="form-control"
-            name="cups"
-            value={form.cups}
-            onChange={handleChange}
-          />
-        </div>
+        <input
+          type="number"
+          className="form-control"
+          name="cups"
+          value={form.cups}
+          onChange={handleChange}
+        />
+      </div>
 
-        {/* ==================================
+      {/* ==================================
             NOTES
         ================================== */}
 
-        <div className="mb-3">
-          <label className="form-label fw-bold">Notes</label>
+      <div className="mb-1">
+        <label className="form-label fw-bold stock-modal-field">Notes</label>
 
-          <textarea
-            className="form-control"
-            rows="3"
-            name="notes"
-            value={form.notes}
-            onChange={handleChange}
-          />
-        </div>
+        <textarea
+          className="form-control"
+          rows="2"
+          name="notes"
+          value={form.notes}
+          onChange={handleChange}
+        />
+      </div>
 
-        {/* ==================================
+      {/* ==================================
             BUTTONS
         ================================== */}
 
-        <div className="d-flex gap-2">
-          <button
-            className={`btn ${
-              editing ? "btn-warning" : "btn-success"
-            } flex-grow-1`}
-            onClick={saveSales}
-          >
-            {editing ? "Update" : "Save Sales"}
-          </button>
+      <div className="d-flex gap-2">
+        <button
+          className={`btn ${
+            editing ? "btn-warning btn-sm" : "btn-success btn-sm"
+          } flex-grow-1`}
+          onClick={saveSales}
+        >
+          {editing ? "Update" : "Save Sales"}
+        </button>
 
-          {editing && (
-            <button className="btn btn-danger" onClick={deleteSales}>
-              Delete
-            </button>
-          )}
-        </div>
+        {editing && (
+          <button className="btn btn-danger" onClick={deleteSales}>
+            Delete
+          </button>
+        )}
       </div>
     </div>
   );

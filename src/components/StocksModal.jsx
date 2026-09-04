@@ -6,6 +6,7 @@ function StocksModal({ show, onClose, onSaved, editingStock, business }) {
     business_id: business,
     stock_name: "",
     unit: "",
+    package_size: "1",
     current_stock: "0",
     reorder_level: "0",
     purchase_cost: "0",
@@ -21,12 +22,15 @@ function StocksModal({ show, onClose, onSaved, editingStock, business }) {
   useEffect(() => {
     if (editingStock) {
       console.log(editingStock);
+
       setForm({
         business_id: business || "",
 
         stock_name: editingStock.stock_name || "",
 
         unit: editingStock.unit || "",
+
+        package_size: editingStock.package_size ?? "1",
 
         current_stock: editingStock.current_stock ?? "0",
 
@@ -37,9 +41,12 @@ function StocksModal({ show, onClose, onSaved, editingStock, business }) {
         supplier_name: editingStock.supplier_name || "",
       });
     } else {
-      setForm(emptyForm);
+      setForm({
+        ...emptyForm,
+        business_id: business,
+      });
     }
-  }, [editingStock]);
+  }, [editingStock, business]);
 
   // =====================================
   // CHANGE
@@ -50,7 +57,6 @@ function StocksModal({ show, onClose, onSaved, editingStock, business }) {
 
     setForm({
       ...form,
-
       [name]: value,
     });
   };
@@ -66,25 +72,26 @@ function StocksModal({ show, onClose, onSaved, editingStock, business }) {
 
     if (form.stock_name.trim() === "") {
       alert("Stock Name is required.");
-
       return;
     }
 
     if (form.unit.trim() === "") {
       alert("Unit is required.");
+      return;
+    }
 
+    if (form.package_size === "" || Number(form.package_size) <= 0) {
+      alert("Package Size must be greater than 0.");
       return;
     }
 
     if (form.purchase_cost === "" || Number(form.purchase_cost) < 0) {
       alert("Purchase Cost is required.");
-
       return;
     }
 
     if (form.reorder_level === "" || Number(form.reorder_level) < 0) {
       alert("Reorder Level is required.");
-
       return;
     }
 
@@ -95,23 +102,25 @@ function StocksModal({ show, onClose, onSaved, editingStock, business }) {
     try {
       if (editingStock) {
         const res = await api.put(`/stocks/${editingStock.stock_id}`, form);
+
         alert(res.data.message);
       } else {
         const res = await api.post("/stocks", form);
+
         alert(res.data.message);
       }
 
       // Reload table
-
       onSaved(business);
 
       // Close modal
-
       onClose();
 
       // Reset
-
-      setForm(emptyForm);
+      setForm({
+        ...emptyForm,
+        business_id: business,
+      });
     } catch (err) {
       console.log(err);
 
@@ -124,7 +133,10 @@ function StocksModal({ show, onClose, onSaved, editingStock, business }) {
   // =====================================
 
   const closeModal = () => {
-    setForm(emptyForm);
+    setForm({
+      ...emptyForm,
+      business_id: business,
+    });
 
     onClose();
   };
@@ -141,7 +153,7 @@ function StocksModal({ show, onClose, onSaved, editingStock, business }) {
 
   return (
     <div
-      className="modal fade show"
+      className="modal fade show stock-modal-main"
       style={{
         display: "block",
         backgroundColor: "rgba(0,0,0,.5)",
@@ -169,15 +181,15 @@ function StocksModal({ show, onClose, onSaved, editingStock, business }) {
           {/* BODY */}
           {/* ============================= */}
 
-          <div className="modal-body">
+          <div className="modal-body stock-modal">
             {/* STOCK NAME */}
 
-            <div className="mb-3">
+            <div className="">
               <label className="form-label">Stock Name</label>
 
               <input
                 type="text"
-                className="form-control"
+                className="form-control stock-modal-field"
                 name="stock_name"
                 value={form.stock_name}
                 onChange={handleChange}
@@ -186,52 +198,81 @@ function StocksModal({ show, onClose, onSaved, editingStock, business }) {
               />
             </div>
 
-            {/* UNIT */}
+            <div className="d-flex gap-2 w-100">
+              {/* UNIT */}
 
-            <div className="mb-3">
-              <label className="form-label">Unit</label>
+              <div className="w-50">
+                <label className="form-label">Unit</label>
 
-              <select
-                className="form-select"
-                name="unit"
-                value={form.unit}
-                onChange={handleChange}
-              >
-                <option value="">Select Unit</option>
+                <select
+                  className="form-select stock-modal-field"
+                  name="unit"
+                  value={form.unit}
+                  onChange={handleChange}
+                >
+                  <option value="">Select Unit</option>
 
-                <option value="pcs">Pieces (pcs)</option>
+                  <option value="pcs">Pieces (pcs)</option>
 
-                <option value="kg">Kilogram (kg)</option>
+                  <option value="kg">Kilogram (kg)</option>
 
-                <option value="g">Gram (g)</option>
+                  <option value="g">Gram (g)</option>
 
-                <option value="L">Liter (L)</option>
+                  <option value="L">Liter (L)</option>
 
-                <option value="ml">Milliliter (ml)</option>
+                  <option value="ml">Milliliter (ml)</option>
 
-                <option value="box">Box</option>
+                  <option value="box">Box</option>
 
-                <option value="pack">Pack</option>
+                  <option value="pack">Pack</option>
 
-                <option value="bottle">Bottle</option>
+                  <option value="bottle">Bottle</option>
 
-                <option value="sachet">Sachet</option>
+                  <option value="sachet">Sachet</option>
 
-                <option value="other">Other</option>
-              </select>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+              {/* PACKAGE SIZE */}
+
+              <div className="w-50">
+                <label className="form-label">Package Size</label>
+
+                <div className="input-group ">
+                  <input
+                    type="number"
+                    className="form-control stock-modal-field"
+                    name="package_size"
+                    value={form.package_size}
+                    onChange={handleChange}
+                    min="0.001"
+                    step="0.001"
+                    placeholder="1.5"
+                  />
+
+                  <span className="input-group-text">
+                    {form.unit || "unit"}
+                  </span>
+                </div>
+
+                <small className="text-muted">
+                  Amount contained in one package.
+                </small>
+              </div>
             </div>
 
             {/* PURCHASE COST */}
 
-            <div className="mb-3">
-              <label className="form-label">Purchase Cost / Unit</label>
+            <div className="">
+              <label className="form-label">Purchase Cost / Package</label>
 
               <div className="input-group">
                 <span className="input-group-text">₱</span>
 
                 <input
                   type="number"
-                  className="form-control"
+                  className="form-control stock-modal-field"
                   name="purchase_cost"
                   value={form.purchase_cost}
                   onChange={handleChange}
@@ -242,18 +283,38 @@ function StocksModal({ show, onClose, onSaved, editingStock, business }) {
               </div>
 
               <small className="text-muted">
-                Your current supplier purchase cost.
+                Cost of one package from your supplier.
               </small>
             </div>
 
+            {/* COST PER UNIT PREVIEW */}
+
+            {Number(form.package_size) > 0 &&
+              Number(form.purchase_cost) >= 0 && (
+                <div className=" alert alert-light border py-2  input-group-text number">
+                  <div className="d-flex justify-content-between w-100">
+                    <div className="text-muted ">
+                      Cost per {form.unit || "unit"}
+                    </div>
+
+                    <div>
+                      ₱
+                      {(
+                        Number(form.purchase_cost) / Number(form.package_size)
+                      ).toFixed(2)}
+                    </div>
+                  </div>
+                </div>
+              )}
+
             {/* REORDER LEVEL */}
 
-            <div className="mb-3">
+            <div className="">
               <label className="form-label">Reorder Level</label>
 
               <input
                 type="number"
-                className="form-control"
+                className="form-control stock-modal-field"
                 name="reorder_level"
                 value={form.reorder_level}
                 onChange={handleChange}
@@ -269,12 +330,12 @@ function StocksModal({ show, onClose, onSaved, editingStock, business }) {
 
             {/* SUPPLIER */}
 
-            <div className="mb-3">
+            <div className="">
               <label className="form-label">Supplier</label>
 
               <input
                 type="text"
-                className="form-control"
+                className="form-control stock-modal-field"
                 name="supplier_name"
                 value={form.supplier_name}
                 onChange={handleChange}
@@ -285,12 +346,12 @@ function StocksModal({ show, onClose, onSaved, editingStock, business }) {
             {/* CURRENT STOCK */}
 
             {!editingStock && (
-              <div className="mb-3">
+              <div className="">
                 <label className="form-label">Initial Stock</label>
 
                 <input
                   type="number"
-                  className="form-control"
+                  className="form-control stock-modal-field"
                   name="current_stock"
                   value={form.current_stock}
                   onChange={handleChange}
@@ -313,13 +374,17 @@ function StocksModal({ show, onClose, onSaved, editingStock, business }) {
           <div className="modal-footer">
             <button
               type="button"
-              className="btn btn-secondary"
+              className="btn btn-secondary btn-sm"
               onClick={closeModal}
             >
               Cancel
             </button>
 
-            <button type="button" className="btn btn-primary" onClick={save}>
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              onClick={save}
+            >
               {editingStock ? "Update" : "Save"}
             </button>
           </div>

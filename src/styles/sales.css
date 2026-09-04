@@ -6,24 +6,18 @@
   width: 100%;
 }
 
-
 /* ========================================
    CALENDAR
 ======================================== */
 
 .calendar-wrapper {
   width: 100%;
-
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
 }
 
 .calendar-wrapper .react-calendar {
   width: 100%;
   max-width: 850px;
 }
-
 
 /* ========================================
    DESKTOP SALES FORM
@@ -37,7 +31,6 @@
   width: 100%;
 }
 
-
 /* ========================================
    TABLET / MOBILE BUTTON
 ======================================== */
@@ -45,7 +38,6 @@
 .sales-form-trigger {
   margin-top: 15px;
 }
-
 
 /* ========================================
    MODAL BACKDROP
@@ -71,7 +63,6 @@
   z-index: 9999;
 }
 
-
 /* ========================================
    MODAL
 ======================================== */
@@ -88,15 +79,12 @@
 
   overflow: hidden;
 
-  box-shadow:
-    0 10px 40px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
 
   animation: salesModalIn 0.2s ease-out;
 }
 
-
 @keyframes salesModalIn {
-
   from {
     opacity: 0;
     transform: translateY(20px);
@@ -106,9 +94,7 @@
     opacity: 1;
     transform: translateY(0);
   }
-
 }
-
 
 /* ========================================
    MODAL HEADER
@@ -126,7 +112,6 @@
   border-bottom: 1px solid #dee2e6;
 }
 
-
 /* ========================================
    MODAL BODY
 ======================================== */
@@ -139,25 +124,20 @@
   overflow-y: auto;
 }
 
-
 /* ========================================
    TABLET
    768px - 1199px
 ======================================== */
 
 @media (max-width: 1199.98px) {
-
   .desktop-sales-form {
     display: none;
   }
 
-
   .calendar-wrapper .react-calendar {
     max-width: 100%;
   }
-
 }
-
 
 /* ========================================
    MOBILE
@@ -165,109 +145,490 @@
 ======================================== */
 
 @media (max-width: 767.98px) {
+  .sale-main-content {
+    display: flex;
+    flex-direction: column-reverse;
+    row-gap: 20px;
+  }
 
   .sales-modal-backdrop {
-
     padding: 0;
 
     align-items: flex-end;
-
   }
 
-
   .sales-modal {
-
     width: 100%;
 
     max-width: 100%;
 
     max-height: 94vh;
 
-    border-radius:
-      16px 16px 0 0;
-
+    border-radius: 16px 16px 0 0;
   }
-
 
   .sales-modal-header {
-
-    padding:
-      14px 16px;
-
+    padding: 14px 16px;
   }
-
 
   .sales-modal-body {
-
     padding: 16px;
 
-    max-height:
-      calc(94vh - 65px);
-
+    max-height: calc(94vh - 65px);
   }
-
 
   .calendar-wrapper .react-calendar {
-
     font-size: 13px;
-
   }
 
-
   .sales-form-trigger {
-
     margin-top: 12px;
 
     margin-bottom: 15px;
-
   }
-
 }
-
 
 /* ========================================
    SMALL MOBILE
 ======================================== */
 
 @media (max-width: 480px) {
-
   .sales-modal {
-
     max-height: 96vh;
-
   }
-
 
   .sales-modal-body {
-
     padding: 14px;
 
-    max-height:
-      calc(96vh - 65px);
-
+    max-height: calc(96vh - 65px);
   }
 
-
   .sales-form-card {
-
     box-shadow: none !important;
 
     border: none;
-
   }
-
 
   .sales-form-card .card-header {
-
     display: none;
-
   }
-
 
   .sales-form-card .card-body {
-
     padding: 0;
+  }
+}
 
+/*  =================================  REPORT MODAL =================================*/
+
+.sales-report-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 9999;
+
+  padding: 20px;
+}
+
+.sales-report-modal {
+  width: 400px;
+  max-width: 700px;
+
+  max-height: 90vh;
+
+  background: #fff;
+
+  border-radius: 12px;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+}
+
+/* ============================
+   HEADER
+============================ */
+
+.sales-report-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 10px 15px;
+
+  border-bottom: 1px solid #eee;
+}
+
+.sales-report-header h2 {
+  margin: 0;
+
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.sales-report-header span {
+  display: block;
+
+  margin-top: 4px;
+
+  font-size: 12px;
+
+  color: #777;
+}
+
+.sales-report-close {
+  border: none;
+
+  background: transparent;
+
+  font-size: 28px;
+
+  cursor: pointer;
+
+  color: #777;
+}
+
+.sales-report-close:hover {
+  color: #111;
+}
+
+/* ============================
+   BODY
+============================ */
+
+.sales-report-body {
+  padding: 10px 15px;
+
+  overflow-y: auto;
+}
+
+/* ============================
+   TABS
+============================ */
+
+.report-tabs {
+  display: flex;
+
+  gap: 8px;
+
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.report-tabs button {
+  border: 1px solid #ddd;
+
+  background: #fff;
+
+  padding: 4px 8px;
+
+  border-radius: 7px;
+
+  cursor: pointer;
+
+  font-size: 13px;
+
+  transition: 0.2s;
+}
+
+.report-tabs button:hover {
+  background: #f5f5f5;
+}
+
+.report-tabs button.active {
+  background: #10c06b;
+
+  border-color: #10c06b;
+
+  color: white;
+
+  font-weight: 600;
+}
+
+/* ============================
+   PERIOD
+============================ */
+
+.report-period {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  margin-bottom: 20px;
+}
+
+.report-period label {
+  font-size: 14px;
+
+  font-weight: 600;
+}
+
+.report-period input,
+.report-period select {
+  padding: 0 10px;
+
+  border: 1px solid #ddd;
+
+  border-radius: 6px;
+
+  font-size: 14px;
+
+  outline: none;
+  width: 100%;
+
+  min-height: 24px !important;
+  padding: 1px 6px !important;
+  font-size: 13px !important;
+  line-height: 18px;
+  max-height: auto !important;
+}
+
+.report-period input:focus,
+.report-period select:focus {
+  border-color: #10c06b;
+}
+
+/* ============================
+   SUMMARY
+============================ */
+
+.report-summary {
+  border-top: 1px solid #eee;
+
+  border-bottom: 1px solid #eee;
+
+  padding: 10px 0;
+
+  margin-bottom: 20px;
+}
+
+.summary-row {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  padding: 9px 0;
+
+  font-size: 14px;
+}
+
+.summary-row strong {
+  font-size: 15px;
+}
+
+.summary-row:first-child strong {
+  font-size: 17px;
+
+  color: #10c06b;
+}
+
+/* ============================
+   TABLE
+============================ */
+
+.report-table-container {
+  width: 100%;
+
+  overflow-x: auto;
+}
+
+.report-table {
+  width: 100%;
+
+  border-collapse: collapse;
+
+  min-width: 450px;
+}
+
+.report-table th {
+  text-align: left;
+
+  padding: 11px 10px;
+
+  background: #f7f7f7;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  border-bottom: 1px solid #ddd;
+}
+
+.report-table td {
+  padding: 11px 10px;
+
+  font-size: 14px;
+
+  border-bottom: 1px solid #eee;
+}
+
+.report-table th:nth-child(2),
+.report-table td:nth-child(2) {
+  text-align: right;
+}
+
+.report-table th:nth-child(3),
+.report-table td:nth-child(3) {
+  text-align: right;
+}
+
+.empty-report {
+  text-align: center !important;
+
+  color: #888;
+
+  padding: 30px !important;
+}
+
+/* ============================
+   LOADING
+============================ */
+
+.report-loading {
+  min-height: 250px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 12px;
+
+  color: #777;
+}
+
+.report-spinner {
+  width: 30px;
+
+  height: 30px;
+
+  border: 3px solid #e5e5e5;
+
+  border-top-color: #10c06b;
+
+  border-radius: 50%;
+
+  animation: report-spin 0.8s linear infinite;
+}
+
+@keyframes report-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================
+   FOOTER
+============================ */
+
+.sales-report-footer {
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  padding: 16px 24px;
+
+  border-top: 1px solid #eee;
+}
+
+.sales-report-footer button {
+
+  padding: 4px 8px;
+
+  border-radius: 7px;
+
+  cursor: pointer;
+
+  font-size: 13px;
+
+  transition: 0.2s;
+}
+
+.report-print-btn {
+  border: none;
+
+  background: #10c06b;
+
+  color: white;
+
+  font-weight: 600;
+}
+
+.report-print-btn:hover {
+  background: #0da95c;
+}
+
+.report-print-btn:disabled {
+  opacity: 0.5;
+
+  cursor: not-allowed;
+}
+
+.report-close-btn {
+  border: 1px solid #ddd;
+
+  background: white;
+
+  color: #333;
+}
+
+.report-close-btn:hover {
+  background: #f5f5f5;
+}
+
+/* ============================
+   MOBILE
+============================ */
+
+@media (max-width: 600px) {
+  .sales-report-overlay {
+    padding: 10px;
   }
 
+  .sales-report-modal {
+    max-height: 95vh;
+
+    border-radius: 10px;
+  }
+
+  .sales-report-header {
+    padding: 16px;
+  }
+
+  .sales-report-body {
+    padding: 16px;
+  }
+
+  .sales-report-footer {
+    padding: 12px 16px;
+  }
+
+  .report-period {
+    align-items: flex-start;
+
+    flex-direction: column;
+  }
+
+  .report-period input,
+  .report-period select {
+    width: 100%;
+  }
 }

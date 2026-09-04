@@ -200,11 +200,11 @@ tbody tr:hover {
 }
 
 .react-calendar__tile {
-  height: 80px;
+  height: 70px;
 }
 
 .react-calendar__month-view__days__day {
-  font-size: 15px;
+  font-size: 13px;
 }
 
 /* Remove the dotted underline */
@@ -366,7 +366,7 @@ tbody tr:hover {
 
 .content {
   flex: 1;
-  padding: 5px;
+  padding: 10px;
 }
 
 /* ========================================
@@ -402,6 +402,9 @@ tbody tr:hover {
 @media (max-width: 767.98px) {
   .main {
     flex-direction: column;
+  }
+  .content {
+    padding: 5px;
   }
 
   .react-calendar__tile {

@@ -192,7 +192,7 @@ function StockMovementModal({
 
   return (
     <div
-      className="modal fade show"
+      className="modal fade show stock-modal-main"
       style={{
         display: "block",
         backgroundColor: "rgba(0,0,0,.5)",
@@ -204,12 +204,12 @@ function StockMovementModal({
           {/* HEADER */}
           {/* ================================= */}
 
-          <div className="modal-header">
+          <div className="modal-header ">
             <h5 className="modal-title">
               {isStockIn ? "Stock In" : "Stock Out"}
             </h5>
 
-            <button type="button" className="btn-close" onClick={closeModal} />
+            <button type="button" className="btn-close btn-sm" onClick={closeModal} />
           </div>
 
           {/* ================================= */}
@@ -219,58 +219,58 @@ function StockMovementModal({
           <div className="modal-body">
             {/* PRODUCT */}
 
-            <div className="mb-3">
+            <div className="mb-1">
               <label className="form-label">Product</label>
 
               <input
                 type="text"
-                className="form-control"
+                className="form-control stock-modal-field"
                 value={stock?.stock_name || ""}
                 readOnly
               />
             </div>
+            <div className="d-flex gap-2 w-100">
+              {/* CURRENT STOCK */}
 
-            {/* CURRENT STOCK */}
+              <div className="mb-1 w-50">
+                <label className="form-label">Current Stock</label>
 
-            <div className="mb-3">
-              <label className="form-label">Current Stock</label>
+                <div className="input-group stock-modal">
+                  <input
+                    type="text"
+                    className="form-control stock-modal-field"
+                    value={currentStock}
+                    readOnly
+                  />
 
-              <div className="input-group">
-                <input
-                  type="text"
-                  className="form-control"
-                  value={currentStock}
-                  readOnly
-                />
+                  <span className="input-group-text">{stock?.unit}</span>
+                </div>
+              </div>
 
-                <span className="input-group-text">{stock?.unit}</span>
+              {/* QUANTITY */}
+
+              <div className="mb-1 w-50 stock-modal">
+                <label className="form-label">
+                  {isStockIn ? "Quantity Purchased" : "Quantity Used"}
+                </label>
+
+                <div className="input-group">
+                  <input
+                    type="number"
+                    className="form-control stock-modal-field"
+                    name="quantity"
+                    value={form.quantity}
+                    onChange={handleChange}
+                    min="0"
+                    step="0.001"
+                    placeholder="Enter quantity"
+                    autoFocus
+                  />
+
+                  <span className="input-group-text">{stock?.unit}</span>
+                </div>
               </div>
             </div>
-
-            {/* QUANTITY */}
-
-            <div className="mb-3">
-              <label className="form-label">
-                {isStockIn ? "Quantity Purchased" : "Quantity Used"}
-              </label>
-
-              <div className="input-group">
-                <input
-                  type="number"
-                  className="form-control"
-                  name="quantity"
-                  value={form.quantity}
-                  onChange={handleChange}
-                  min="0"
-                  step="0.001"
-                  placeholder="Enter quantity"
-                  autoFocus
-                />
-
-                <span className="input-group-text">{stock?.unit}</span>
-              </div>
-            </div>
-
             {/* ================================= */}
             {/* STOCK IN ONLY */}
             {/* ================================= */}
@@ -279,15 +279,15 @@ function StockMovementModal({
               <>
                 {/* UNIT COST */}
 
-                <div className="mb-3">
+                <div className="mb-1">
                   <label className="form-label">Purchase Cost / Unit</label>
 
-                  <div className="input-group">
+                  <div className="input-group stock-modal">
                     <span className="input-group-text">₱</span>
 
                     <input
                       type="number"
-                      className="form-control"
+                      className="form-control stock-modal-field"
                       name="unit_cost"
                       value={form.unit_cost}
                       onChange={handleChange}
@@ -299,10 +299,10 @@ function StockMovementModal({
 
                 {/* TOTAL COST */}
 
-                <div className="mb-3">
+                <div className="mb-1 stock-modal">
                   <label className="form-label">Total Purchase Cost</label>
 
-                  <div className="form-control bg-light">
+                  <div className="form-control bg-light input-group-text">
                     ₱
                     {totalCost.toLocaleString("en-PH", {
                       minimumFractionDigits: 2,
@@ -313,12 +313,12 @@ function StockMovementModal({
 
                 {/* SUPPLIER */}
 
-                <div className="mb-3">
+                <div className="mb-1">
                   <label className="form-label">Supplier</label>
 
                   <input
                     type="text"
-                    className="form-control"
+                    className="form-control stock-modal-field"
                     name="supplier_name"
                     value={form.supplier_name}
                     onChange={handleChange}
@@ -333,11 +333,11 @@ function StockMovementModal({
             {/* ================================= */}
 
             {!isStockIn && (
-              <div className="mb-3">
+              <div className="mb-1">
                 <label className="form-label">Reason</label>
 
                 <select
-                  className="form-select"
+                  className="form-select stock-modal-field"
                   name="reference_type"
                   value={form.reference_type}
                   onChange={handleChange}
@@ -361,12 +361,12 @@ function StockMovementModal({
 
             {/* DATE */}
 
-            <div className="mb-3">
+            <div className="mb-1">
               <label className="form-label">Date</label>
 
               <input
                 type="date"
-                className="form-control"
+                className="form-control stock-modal-field"
                 name="transaction_date"
                 value={form.transaction_date}
                 onChange={handleChange}
@@ -375,11 +375,11 @@ function StockMovementModal({
 
             {/* NEW STOCK PREVIEW */}
 
-            <div className="mb-3">
+            <div className="mb-1 stock-modal">
               <label className="form-label">New Stock</label>
 
               <div
-                className={`form-control ${
+                className={`form-control input-group-text ${
                   newStock < 0 ? "text-danger" : "bg-light"
                 }`}
               >
@@ -389,11 +389,11 @@ function StockMovementModal({
 
             {/* NOTES */}
 
-            <div className="mb-3">
+            <div className="mb-1">
               <label className="form-label">Notes</label>
 
               <textarea
-                className="form-control"
+                className="form-control stock-modal-field"
                 name="notes"
                 value={form.notes}
                 onChange={handleChange}
@@ -410,7 +410,7 @@ function StockMovementModal({
           <div className="modal-footer">
             <button
               type="button"
-              className="btn btn-secondary"
+              className="btn btn-secondary btn-sm"
               onClick={closeModal}
             >
               Cancel
@@ -418,7 +418,9 @@ function StockMovementModal({
 
             <button
               type="button"
-              className={isStockIn ? "btn btn-success" : "btn btn-danger"}
+              className={
+                isStockIn ? "btn btn-success btn-sm" : "btn btn-danger btn-sm"
+              }
               onClick={save}
             >
               {isStockIn ? "Stock In" : "Stock Out"}
